@@ -63,50 +63,50 @@ const App = () => {
         if (snapshotBatches.empty) {
           console.log("Seeding Demo Batches...");
           const demoBatches = [
-            { 
-              batch_id: 'BATCH-001', 
-              type: 'batch', 
-              status: 'received', 
-              creator_id: 'AGG-1001', 
-              current_owner_id: 'AGG-1001', 
-              quantity: '500kg', 
-              herb_name: 'Ashwagandha', 
+            {
+              batch_id: 'BATCH-001',
+              type: 'batch',
+              status: 'received',
+              creator_id: 'AGG-1001',
+              current_owner_id: 'AGG-1001',
+              quantity: '500kg',
+              herb_name: 'Ashwagandha',
               created_at: new Date().toISOString(),
               metadata: { condition: 'Premium', moisture: '8%' }
             },
-            { 
-              batch_id: 'PROC-B-99', 
-              type: 'processed', 
-              status: 'verified', 
-              creator_id: 'PROC-2001', 
-              current_owner_id: 'PROC-2001', 
-              quantity: '150kg', 
-              herb_name: 'Brahmi Extract', 
+            {
+              batch_id: 'PROC-B-99',
+              type: 'processed',
+              status: 'verified',
+              creator_id: 'PROC-2001',
+              current_owner_id: 'PROC-2001',
+              quantity: '150kg',
+              herb_name: 'Brahmi Extract',
               created_at: new Date().toISOString(),
-              metadata: { 
-                operation: 'Extractions', 
-                temperature: '65', 
-                duration: '12', 
-                qualityTest: { 
-                  testType: 'AYUSH Premium', 
-                  results: 'PASSED', 
-                  authority: 'Central Lab', 
-                  timestamp: new Date().toISOString() 
-                } 
+              metadata: {
+                operation: 'Extractions',
+                temperature: '65',
+                duration: '12',
+                qualityTest: {
+                  testType: 'AYUSH Premium',
+                  results: 'PASSED',
+                  authority: 'Central Lab',
+                  timestamp: new Date().toISOString()
+                }
               }
             },
-            { 
-              batch_id: 'LOT-505', 
-              type: 'lot', 
-              status: 'dispatched', 
-              creator_id: 'AGG-1001', 
-              current_owner_id: 'PROC-2001', 
-              quantity: '1200kg', 
-              herb_name: 'Tulsi Leaves', 
+            {
+              batch_id: 'LOT-505',
+              type: 'lot',
+              status: 'dispatched',
+              creator_id: 'AGG-1001',
+              current_owner_id: 'PROC-2001',
+              quantity: '1200kg',
+              herb_name: 'Tulsi Leaves',
               created_at: new Date().toISOString(),
-              metadata: { 
-                waybill: 'WB-78891', 
-                vehicle: 'MH-12-AS-9080' 
+              metadata: {
+                waybill: 'WB-78891',
+                vehicle: 'MH-12-AS-9080'
               }
             }
           ];
@@ -115,7 +115,7 @@ const App = () => {
           }
           console.log("Demo batches successfully seeded.");
         }
-      } catch(e) {
+      } catch (e) {
         console.error("Firebase Seeding failed (Make sure your config is valid):", e);
       }
     };
