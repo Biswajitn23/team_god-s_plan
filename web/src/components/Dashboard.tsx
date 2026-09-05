@@ -20,7 +20,15 @@ import {
   Phone,
   Globe,
   Leaf,
-  Sparkles
+  Sparkles,
+  Search,
+  Truck,
+  Map,
+  Users,
+  BarChart3,
+  Boxes,
+  QrCode,
+  PackageCheck
 } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '@/integrations/firebase/client';
@@ -44,6 +52,7 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [profileData, setProfileData] = useState<any>(null);
   const [currentSubView, setCurrentSubView] = useState<string | null>(null);
+  const [activeNavTab, setActiveNavTab] = useState<string>('dashboard');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -90,10 +99,10 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
       {/* 1. OFFICIAL GOVT OF INDIA & AYUSH TOP HEADER                              */}
       {/* ========================================================================= */}
       <header className="bg-white border-b border-slate-200/90 relative z-30 px-4 sm:px-8 py-3">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
           
           {/* Left: Emblem of India + Ministry of Ayush + AyuSetu Brand */}
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-3 sm:gap-6 shrink-0">
             <div className="flex items-center gap-2.5">
               <svg
                 className="w-8 h-10 sm:w-9 sm:h-11 text-slate-800"
@@ -136,8 +145,26 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
             </div>
           </div>
 
+          {/* Center: Global Search Bar */}
+          <div className="hidden xl:flex items-center flex-1 max-w-lg mx-4">
+            <div className="relative w-full">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder={
+                  userRole === 'distributor'
+                    ? "Search by Product ID / Batch ID / Farmer / Destination..."
+                    : userRole === 'manufacturer'
+                    ? "Search Batch ID / Product / Herb / Farmer..."
+                    : "Search Batch ID / Herb / Farmer..."
+                }
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/90 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-slate-700 placeholder:text-slate-400"
+              />
+            </div>
+          </div>
+
           {/* Right: Digital India, Viksit Bharat, Live Clock & Logout */}
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-3 sm:gap-5 shrink-0">
             {/* Digital India */}
             <div className="hidden md:flex items-center gap-2">
               <div className="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
@@ -273,23 +300,132 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
                 <div className="flex flex-col items-center text-center">
                   {/* Avatar Badge */}
                   <div className="w-20 h-20 rounded-full bg-[#1b4d3e] text-white flex items-center justify-center text-3xl font-black shadow-md border-4 border-emerald-50 mb-3">
-                    {userId ? userId.charAt(0).toUpperCase() : 'A'}
+                    {userId ? userId.charAt(0).toUpperCase() : (userRole === 'distributor' ? 'D' : 'A')}
                   </div>
 
                   <h2 className="text-xl font-bold font-mono text-slate-900 tracking-tight">
-                    {userId}
+                    {userId || (userRole === 'distributor' ? 'DIST-4001' : 'MOCK_ID')}
                   </h2>
                   
                   <span className="inline-block mt-1 px-3.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-[#0d5c3a] capitalize">
                     {userRole}
                   </span>
 
-                  {profileData && (
-                    <div className="mt-2 text-center">
-                      <p className="text-xs font-bold text-slate-800">{profileData.name}</p>
-                      <p className="text-[10px] text-slate-500 font-medium">📍 {profileData.location}</p>
-                    </div>
-                  )}
+                  <p className="text-[11px] text-slate-500 font-medium mt-1">
+                    {roleOfficerTitles[userRole] || 'Logistics Operations Lead'}
+                  </p>
+
+                  {/* Sidebar Navigation Items */}
+                  <div className="w-full mt-5 space-y-1 text-left">
+                    <button
+                      onClick={() => setActiveNavTab('dashboard')}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        activeNavTab === 'dashboard'
+                          ? 'bg-[#e8f5e9] text-[#0d5c3a]'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                    >
+                      <Home className="w-4 h-4" />
+                      <span>Dashboard</span>
+                    </button>
+
+                    {userRole === 'distributor' && (
+                      <>
+                        <button
+                          onClick={() => setActiveNavTab('dispatch')}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                            activeNavTab === 'dispatch'
+                              ? 'bg-[#e8f5e9] text-[#0d5c3a]'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <Truck className="w-4 h-4 text-slate-500" />
+                          <span>Dispatch Product</span>
+                        </button>
+
+                        <button
+                          onClick={() => setActiveNavTab('fleet')}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                            activeNavTab === 'fleet'
+                              ? 'bg-[#e8f5e9] text-[#0d5c3a]'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <Map className="w-4 h-4 text-slate-500" />
+                          <span>Monitor Fleet</span>
+                        </button>
+
+                        <button
+                          onClick={() => setActiveNavTab('farmers')}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                            activeNavTab === 'farmers'
+                              ? 'bg-[#e8f5e9] text-[#0d5c3a]'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <Users className="w-4 h-4 text-slate-500" />
+                          <span>Farmer Database</span>
+                        </button>
+
+                        <button
+                          onClick={() => setActiveNavTab('history')}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                            activeNavTab === 'history'
+                              ? 'bg-[#e8f5e9] text-[#0d5c3a]'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <FileText className="w-4 h-4 text-slate-500" />
+                          <span>Shipment History</span>
+                        </button>
+
+                        <button
+                          onClick={() => setActiveNavTab('reports')}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                            activeNavTab === 'reports'
+                              ? 'bg-[#e8f5e9] text-[#0d5c3a]'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <BarChart3 className="w-4 h-4 text-slate-500" />
+                          <span>Reports & Analytics</span>
+                        </button>
+                      </>
+                    )}
+
+                    {userRole === 'manufacturer' && (
+                      <>
+                        <button
+                          onClick={() => setActiveNavTab('create-product')}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                          <Boxes className="w-4 h-4 text-slate-500" />
+                          <span>Create Final Product</span>
+                        </button>
+                        <button
+                          onClick={() => setActiveNavTab('qr-codes')}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                          <QrCode className="w-4 h-4 text-slate-500" />
+                          <span>View QR Codes</span>
+                        </button>
+                        <button
+                          onClick={() => setActiveNavTab('farmer-details')}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                          <Users className="w-4 h-4 text-slate-500" />
+                          <span>Farmer Details</span>
+                        </button>
+                        <button
+                          onClick={() => setActiveNavTab('recall')}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                          <ShieldAlert className="w-4 h-4 text-slate-500" />
+                          <span>Initiate Recall</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
 
                   {/* Metadata Table */}
                   <div className="w-full mt-6 pt-5 border-t border-slate-100 space-y-2.5 text-left text-xs">
@@ -299,7 +435,7 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
                         <span>Terminal ID</span>
                       </div>
                       <span className="font-mono font-bold text-slate-800">
-                        ST-{userId.split('-')[1] || '1001'}
+                        ST-{userId.split('-')[1] || (userRole === 'distributor' ? '4001' : '1001')}
                       </span>
                     </div>
 
