@@ -1,6 +1,29 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronRight, ShieldCheck, Sparkles, Users, Sprout, Leaf, ArrowRight, QrCode } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ChevronRight,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Sprout,
+  Leaf,
+  ArrowRight,
+  QrCode,
+  Truck,
+  FlaskConical,
+  Package,
+  Layers,
+  MapPin,
+  CheckCircle2,
+  ExternalLink,
+  Lock,
+  Cpu,
+  Database,
+  Radio,
+  Clock,
+  FileText,
+  X
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ayuestufrontpage from '@/assets/ayuestufrontpage.png';
 
@@ -8,8 +31,152 @@ interface WelcomeScreenProps {
   onGetStarted: () => void;
 }
 
+interface PrototypeStage {
+  id: number;
+  stageNumber: string;
+  title: string;
+  hindiTitle: string;
+  role: string;
+  badgeColor: string;
+  icon: any;
+  summary: string;
+  keyFeatures: string[];
+  techStack: string[];
+  hashSample: string;
+  simulatedData: Record<string, string>;
+}
+
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) => {
   const navigate = useNavigate();
+  const [selectedStageModal, setSelectedStageModal] = useState<PrototypeStage | null>(null);
+
+  const prototypeStages: PrototypeStage[] = [
+    {
+      id: 1,
+      stageNumber: "01",
+      title: "Farmer & Cultivation",
+      hindiTitle: "किसान और औषधीय फसल",
+      role: "farmer",
+      badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      icon: Sprout,
+      summary: "GPS geo-tagged harvest collection directly from certified farmers and wild-herb collectors with dynamic MSP protection.",
+      keyFeatures: [
+        "Satellite GPS & timestamp verification",
+        "Aadhaar-linked farmer direct payouts",
+        "GAP & Organic standard validation",
+        "Species authenticity validation (Ashwagandha, Brahmi)"
+      ],
+      techStack: ["GeoJSON GPS", "Aadhaar e-KYC", "Firestore Realtime"],
+      hashSample: "0x7a8f9c12b4e6d308...99e1",
+      simulatedData: {
+        "Farmer ID": "FARM-001 (Rajesh Kumar)",
+        "Farm Location": "Aurangabad, MH (19.8762° N, 75.3433° E)",
+        "Harvest Crop": "Ashwagandha (Withania somnifera)",
+        "Moisture Content": "8.2% (Grade A Premium)",
+        "Verified By": "Local AYUSH Field Officer"
+      }
+    },
+    {
+      id: 2,
+      stageNumber: "02",
+      title: "Regional Aggregation",
+      hindiTitle: "क्षेत्रीय एकत्रीकरण केंद्र",
+      role: "aggregator",
+      badgeColor: "bg-teal-100 text-teal-800 border-teal-200",
+      icon: Layers,
+      summary: "Digital weighment, physical quality testing, consolidation into standardized lots, and tamper-proof barcode assignment.",
+      keyFeatures: [
+        "Calibrated digital weighment intake",
+        "Moisture & foreign matter screening",
+        "Consolidated consignment grouping",
+        "Blockchain minting of raw herb batch"
+      ],
+      techStack: ["SHA-256 Batch Hashing", "Barcode Serialization"],
+      hashSample: "0x3f12e89a5c0b7412...88a4",
+      simulatedData: {
+        "Aggregator Hub": "AGG-1001 (MahaAgri Hub)",
+        "Consignment ID": "BATCH-001",
+        "Total Intake": "500.00 kg",
+        "Lab Assay Ref": "AYUSH-LAB-9921",
+        "Consolidation Status": "Consolidated & Dispatched"
+      }
+    },
+    {
+      id: 3,
+      stageNumber: "03",
+      title: "Refinement & Processing",
+      hindiTitle: "प्रसंस्करण और निष्कर्षण",
+      role: "processor",
+      badgeColor: "bg-cyan-100 text-cyan-800 border-cyan-200",
+      icon: FlaskConical,
+      summary: "Standardized solvent extraction, grinding, HPLC purity testing, and generation of verified Certificate of Analysis (CoA).",
+      keyFeatures: [
+        "Precision temperature/pressure control",
+        "Automated yield calculation & loss tracking",
+        "HPLC/GC-MS chemical assay upload",
+        "GMP compliance pass/fail certification"
+      ],
+      techStack: ["Industrial Telemetry", "CoA Digital Signature"],
+      hashSample: "0x91d4e723ac85bf10...44d2",
+      simulatedData: {
+        "Facility": "PROC-2001 (Western Ghats Plant)",
+        "Operation": "Hydro-Alcoholic Extraction",
+        "Active Withanolides": "5.4% (Exceeds Pharmacopoeia 2.5%)",
+        "Heavy Metals Test": "Passed (Below 0.01 ppm)",
+        "QC Clearance": "Approved by AYUSH Officer"
+      }
+    },
+    {
+      id: 4,
+      stageNumber: "04",
+      title: "GMP Formulation Vault",
+      hindiTitle: "जीएमपी फॉर्मूलेशन और क्यूआर",
+      role: "manufacturer",
+      badgeColor: "bg-purple-100 text-purple-800 border-purple-200",
+      icon: Package,
+      summary: "Finished product blending (Churna, Syrup, Capsules), packaging serialization, and on-chain verifiable cryptographic QR pass generation.",
+      keyFeatures: [
+        "Multi-ingredient recipe composition",
+        "Dosage standardization & shelf-life lock",
+        "Verifiable dynamic QR code rendering",
+        "Anti-counterfeit cryptographic seal"
+      ],
+      techStack: ["Dynamic Cryptographic QR", "ERC-721 Provenance"],
+      hashSample: "0x54e81b99cf0214a7...22f9",
+      simulatedData: {
+        "Manufacturer": "MFG-3001 (Ayurveda Life Labs)",
+        "Final Product": "Ayu Immunity Churna (250g)",
+        "Batch Code": "FP-2026-001",
+        "Shelf Life": "24 Months (Exp: Aug 2028)",
+        "QR Status": "Cryptographically Sealed"
+      }
+    },
+    {
+      id: 5,
+      stageNumber: "05",
+      title: "Smart Logistics & Verify",
+      hindiTitle: "स्मार्ट लॉजिस्टिक्स और सत्यापन",
+      role: "distributor",
+      badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
+      icon: Truck,
+      summary: "Cold-chain GPS fleet monitoring, destination pharmacy delivery, and instant public consumer verification via smartphone scan.",
+      keyFeatures: [
+        "Live satellite GPS vector tracking",
+        "Cold-chain temp logs (15°C - 25°C)",
+        "Instant public smartphone QR scan",
+        "100% farm-to-shelf provenance audit"
+      ],
+      techStack: ["Satellite Telemetry", "Public Web Verification"],
+      hashSample: "0x12c98d45fe776091...00b8",
+      simulatedData: {
+        "Logistics Lead": "DIST-4001 (All-India Logistics)",
+        "Vehicle Vector": "DL-01-AB-1234 (Live GPS)",
+        "Storage Temp": "21.5°C (Optimal Range)",
+        "Destination": "State Ayush Depot, Varanasi",
+        "Consumer Scan": "Publicly Accessible"
+      }
+    }
+  ];
 
   return (
     <div className="relative min-h-screen w-full bg-[#faf9f5] text-slate-800 flex flex-col justify-between overflow-x-hidden select-none font-sans">
@@ -30,11 +197,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
               fill="currentColor"
               aria-label="Emblem of India"
             >
-              {/* Stylized Lion Capital SVG */}
               <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z M50 12 C55 12 58 18 58 25 C58 32 55 38 50 38 C45 38 42 32 42 25 C42 18 45 12 50 12 Z M35 70 C35 60 42 50 50 50 C58 50 65 60 65 70 C65 78 58 86 50 86 C42 86 35 78 35 70 Z" />
-              {/* Ashoka Chakra in base */}
               <circle cx="50" cy="98" r="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
-              {/* Satyameva Jayate text line placeholder */}
               <rect x="25" y="110" width="50" height="3" rx="1.5" fill="currentColor" />
             </svg>
             <div className="flex flex-col leading-tight border-r border-slate-300 pr-4">
@@ -75,7 +239,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
         <div className="flex items-center gap-4 sm:gap-6">
           {/* Digital India Official Mark */}
           <div className="flex items-center gap-2">
-            {/* Digital India 'd' logo representation */}
             <div className="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center">
               <div className="w-8 h-8 rounded-full border-[3px] border-[#FF9933] border-t-[#138808] border-r-[#000080] flex items-center justify-center transform -rotate-45">
                 <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-[#000080] via-[#FF9933] to-[#138808]" />
@@ -214,18 +377,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
             </svg>
           </div>
 
-          {/* Decorative Botanical Leaf Silhouettes in background */}
+          {/* Decorative Botanical Leaf Silhouettes */}
           <div className="absolute right-4 top-1/3 opacity-[0.07] pointer-events-none -z-0">
             <svg className="w-48 h-48 text-emerald-900" viewBox="0 0 200 200" fill="currentColor">
               <path d="M100 20 C60 50 30 110 50 160 C70 140 85 100 100 70 C115 100 130 140 150 160 C170 110 140 50 100 20 Z" />
               <path d="M140 60 C170 80 190 120 180 160 C160 145 145 120 135 100 C140 85 140 70 140 60 Z" opacity="0.6" />
-            </svg>
-          </div>
-
-          {/* Decorative Rashtrapati Bhavan / Parliament Silhouette in Bottom Right */}
-          <div className="absolute bottom-0 right-0 opacity-[0.08] pointer-events-none -z-0 hidden md:block">
-            <svg className="w-72 h-44 text-amber-900" viewBox="0 0 300 150" fill="currentColor">
-              <path d="M150 15 C135 15 130 30 130 45 L170 45 C170 30 165 15 150 15 Z M120 45 L180 45 L180 55 L120 55 Z M40 55 L260 55 L260 70 L40 70 Z M50 70 L50 120 L65 120 L65 70 Z M80 70 L80 120 L95 120 L95 70 Z M110 70 L110 120 L125 120 L125 70 Z M140 70 L140 120 L160 120 L160 70 Z M175 70 L175 120 L190 120 L190 70 Z M205 70 L205 120 L220 120 L220 70 Z M235 70 L235 120 L250 120 L250 70 Z M20 120 L280 120 L280 145 L20 145 Z" />
             </svg>
           </div>
 
@@ -291,30 +447,45 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
               </div>
             </div>
 
-            {/* CTAs: Get Started Button & QR Verify */}
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              {/* Primary "Get Started >" Button */}
+            {/* CTAs: Get Started Button, Look at Prototype Button & QR Verify */}
+            <div className="pt-4 flex flex-wrap items-center gap-3.5 sm:gap-4">
+              {/* 1. Primary "Get Started >" Button */}
               <button
                 id="get-started-btn"
                 onClick={onGetStarted}
-                className="group relative inline-flex items-center justify-center h-14 sm:h-16 px-8 sm:px-10 rounded-full bg-[#0d5c3a] hover:bg-[#09462b] text-white font-bold text-lg sm:text-xl shadow-[0_10px_25px_rgba(13,92,58,0.35)] hover:shadow-[0_15px_30px_rgba(13,92,58,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 overflow-hidden"
+                className="group relative inline-flex items-center justify-center h-14 sm:h-16 px-7 sm:px-9 rounded-full bg-[#0d5c3a] hover:bg-[#09462b] text-white font-bold text-base sm:text-lg shadow-[0_10px_25px_rgba(13,92,58,0.35)] hover:shadow-[0_15px_30px_rgba(13,92,58,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 overflow-hidden"
               >
                 <span className="mr-2 tracking-wide font-sans">Get Started</span>
-                <ChevronRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" strokeWidth={2.8} />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1.5 transition-transform" strokeWidth={2.8} />
                 {/* Subtle Sheen Sweep */}
                 <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-15deg)_translateX(-120%)] group-hover:duration-1000 group-hover:[transform:skew(-15deg)_translateX(120%)] pointer-events-none">
                   <div className="relative h-full w-14 bg-white/20" />
                 </div>
               </button>
 
-              {/* Public Consumer Quick Verify Link */}
+              {/* 2. Look at Prototype Button (New Feature) */}
+              <button
+                id="look-at-prototype-btn"
+                onClick={() => {
+                  const el = document.getElementById('prototype-stage-section');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="group inline-flex items-center gap-2 h-14 sm:h-16 px-6 sm:px-7 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-base sm:text-lg shadow-[0_8px_20px_rgba(245,158,11,0.35)] hover:shadow-[0_12px_25px_rgba(245,158,11,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer overflow-hidden"
+              >
+                <Sparkles className="w-5 h-5 text-amber-100 animate-pulse" />
+                <span>Look at Prototype</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* 3. Public Consumer Quick Verify Link */}
               <button
                 onClick={() => navigate('/verify')}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm shadow-sm hover:shadow transition-all"
+                className="inline-flex items-center gap-2 h-14 sm:h-16 px-5 sm:px-6 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm sm:text-base shadow-sm hover:shadow transition-all"
               >
-                <QrCode className="w-4 h-4 text-[#0d5c3a]" />
-                <span>Verify Herb Batch / QR</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700" />
+                <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-[#0d5c3a]" />
+                <span>Verify Batch QR</span>
               </button>
             </div>
 
@@ -360,7 +531,257 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
       </main>
 
       {/* ========================================================================= */}
-      {/* 3. BOTTOM TICKER / ACCESSIBILITY FOOTER                                  */}
+      {/* 3. "HAVE A LOOK AT OUR PROTOTYPE STAGE" INTERACTIVE SECTION                */}
+      {/* ========================================================================= */}
+      <section 
+        id="prototype-stage-section" 
+        className="relative z-10 w-full bg-gradient-to-b from-white via-[#f4faf6] to-[#ebf5ef] border-t-2 border-emerald-200/90 py-16 px-4 sm:px-8 md:px-14 shadow-inner"
+      >
+        <div className="max-w-7xl mx-auto space-y-12">
+          
+          {/* Section Header */}
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-300/80 text-amber-800 text-xs font-extrabold uppercase tracking-widest shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <span>LIVE SYSTEM PROTOTYPE WALKTHROUGH</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight font-serif">
+              Have a look at our <span className="text-[#0d5c3a]">prototype stage</span>
+            </h2>
+
+            <p className="text-xs sm:text-sm font-semibold text-emerald-800/90 font-serif">
+              हमारे प्रोटोटाइप चरण का अवलोकन करें - 5 परस्पर जुड़े सत्यापन चरण
+            </p>
+
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+              AyuSetu connects farmers, collectors, labs, manufacturers, and distributors into a single, unified, tamper-proof blockchain traceability pipeline. Click any stage below to explore its live simulated telemetry and on-chain ledger state.
+            </p>
+
+            <div className="flex items-center justify-center gap-1.5 pt-1">
+              <span className="w-10 h-1 bg-[#FF9933] rounded-full" />
+              <span className="w-10 h-1 bg-slate-300 rounded-full" />
+              <span className="w-10 h-1 bg-[#138808] rounded-full" />
+            </div>
+          </div>
+
+          {/* 5 Prototype Stages Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+            {prototypeStages.map((stage) => {
+              const StageIcon = stage.icon;
+              return (
+                <div
+                  key={stage.id}
+                  onClick={() => setSelectedStageModal(stage)}
+                  className="bg-white rounded-3xl p-5 border border-emerald-200/80 shadow-sm hover:shadow-xl hover:border-emerald-400 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                >
+                  {/* Top Color Accent Ribbon */}
+                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 to-[#0d5c3a]" />
+
+                  {/* Stage Number & Icon */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-black font-mono text-slate-300 group-hover:text-[#0d5c3a] transition-colors">
+                        STAGE {stage.stageNumber}
+                      </span>
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-[#0d5c3a] border border-emerald-100 flex items-center justify-center shadow-2xs group-hover:bg-[#0d5c3a] group-hover:text-white transition-all">
+                        <StageIcon className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 leading-tight group-hover:text-[#0d5c3a] transition-colors">
+                        {stage.title}
+                      </h3>
+                      <p className="text-[11px] text-emerald-700/90 font-serif font-medium mt-0.5">
+                        {stage.hindiTitle}
+                      </p>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {stage.summary}
+                    </p>
+
+                    {/* Features checklist */}
+                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                      {stage.keyFeatures.slice(0, 2).map((feat, idx) => (
+                        <div key={idx} className="flex items-start gap-1.5 text-[11px] text-slate-700">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="leading-tight">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom Footer CTA */}
+                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#0d5c3a] group-hover:text-emerald-800">
+                    <span className="flex items-center gap-1">
+                      <Cpu className="w-3.5 h-3.5" />
+                      <span>Inspect Stage</span>
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Direct Live Action Bar for Prototype Testing */}
+          <div className="rounded-3xl bg-gradient-to-r from-[#1b4d3e] via-[#0d5c3a] to-[#144838] p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-200">
+                  Interactive Sandbox Available
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black font-serif tracking-tight">
+                Ready to test the live role portals?
+              </h3>
+              <p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
+                Experience the full operational dashboard for all roles including Aggregator, Processor, Manufacturer, Distributor, and Farmers.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={onGetStarted}
+                className="px-6 py-3 rounded-full bg-white hover:bg-emerald-50 text-[#0d5c3a] font-bold text-sm shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all"
+              >
+                Launch Role Selector
+              </button>
+              <button
+                onClick={() => navigate('/verify')}
+                className="px-6 py-3 rounded-full bg-emerald-800/80 hover:bg-emerald-800 text-white border border-emerald-500/40 font-bold text-sm shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5"
+              >
+                <QrCode className="w-4 h-4" />
+                <span>Test Consumer QR Scan</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 4. PROTOTYPE STAGE INSPECTION MODAL                                       */}
+      {/* ========================================================================= */}
+      <AnimatePresence>
+        {selectedStageModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl max-w-2xl w-full border border-emerald-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Modal Header */}
+              <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 px-6 sm:px-8 py-5 border-b border-emerald-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#0d5c3a] text-white flex items-center justify-center shadow-md">
+                    {React.createElement(selectedStageModal.icon, { className: "w-6 h-6" })}
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-mono font-extrabold text-[#0d5c3a] uppercase tracking-wider">
+                      PROTOTYPE STAGE {selectedStageModal.stageNumber}
+                    </span>
+                    <h3 className="text-xl font-black text-slate-900 leading-tight">
+                      {selectedStageModal.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedStageModal(null)}
+                  className="w-9 h-9 rounded-full bg-white hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors shadow-2xs"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
+                <div>
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                    Stage Description & Mission
+                  </h4>
+                  <p className="text-sm font-medium text-slate-700 mt-1 leading-relaxed">
+                    {selectedStageModal.summary}
+                  </p>
+                </div>
+
+                {/* Simulated Real-Time Data Block */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                      Simulated Live Telemetry & Ledger Block
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Live Verified
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-900 text-slate-100 rounded-2xl p-4 font-mono text-xs space-y-2 border border-slate-800 shadow-inner">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-emerald-400 text-[11px]">
+                      <span>Hash: {selectedStageModal.hashSample}</span>
+                      <span className="text-slate-400">AYUSH-NODE-OK</span>
+                    </div>
+
+                    {Object.entries(selectedStageModal.simulatedData).map(([key, value]) => (
+                      <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between text-slate-300 text-[11px] gap-0.5">
+                        <span className="text-slate-400">{key}:</span>
+                        <span className="font-bold text-white text-right">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Technical Stack Tags */}
+                <div>
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">
+                    Security & Verification Technologies
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedStageModal.techStack.map((tech, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="bg-slate-50 px-6 sm:px-8 py-4 border-t border-slate-200 flex items-center justify-between">
+                <button
+                  onClick={() => setSelectedStageModal(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900"
+                >
+                  Close
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedStageModal(null);
+                    onGetStarted();
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#0d5c3a] hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm"
+                >
+                  <span>Enter {selectedStageModal.title} Portal</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================================= */}
+      {/* 5. BOTTOM TICKER / ACCESSIBILITY FOOTER                                  */}
       {/* ========================================================================= */}
       <footer className="relative z-10 w-full bg-emerald-950 text-emerald-100/80 text-[10px] sm:text-xs py-2 px-6 flex flex-col sm:flex-row items-center justify-between gap-1 border-t border-emerald-800/40">
         <div className="flex items-center gap-3">
