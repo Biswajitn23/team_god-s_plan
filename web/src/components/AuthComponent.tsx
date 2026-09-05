@@ -21,8 +21,10 @@ import { firestore } from '@/integrations/firebase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronRight, Lock, Check, Heart, Loader2, ChevronDown, Eye, EyeOff,
-  FileDown, QrCode, ShieldCheck as ShieldIcon, User 
+  FileDown, QrCode, ShieldCheck as ShieldIcon, User, ArrowLeft 
 } from 'lucide-react';
+import { WelcomeScreen } from './WelcomeScreen';
+import { RoleSelectionScreen } from './RoleSelectionScreen';
 
 interface AuthComponentProps {
   onLogin: (role: string, userId: string) => void;
@@ -564,41 +566,72 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
     );
   }
 
+  if (!hasStarted) {
+    return (
+      <>
+        {isAuthLoading && <AyuLoader />}
+        <WelcomeScreen onGetStarted={() => setHasStarted(true)} />
+      </>
+    );
+  }
+
+  if (step === 'role-selection') {
+    return (
+      <>
+        {isAuthLoading && <AyuLoader />}
+        <RoleSelectionScreen
+          onSelectRole={handleRoleSelect}
+          onBackToHome={() => setHasStarted(false)}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       {isAuthLoading && <AyuLoader />}
-      <div className="h-dvh flex flex-col lg:flex-row bg-gradient-to-br from-amber-50 via-green-50 to-green-100 overflow-hidden">
+      <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-amber-50/60 via-green-50/50 to-emerald-100/50 overflow-y-auto">
 
         {/* Left Panel (40%) */}
-        <div className="hidden lg:flex lg:w-[40%] relative flex-col justify-between p-8 overflow-hidden">
+        <div className="hidden lg:flex lg:w-[40%] relative flex-col justify-between p-8 overflow-hidden min-h-screen">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img src={ayuestufrontpage} alt="AyuSetu Background" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-black/70" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
           </div>
 
-          {/* Top Logo Section - Moved Up & Smaller */}
-          <div className="relative z-10 flex items-center gap-3 top-2">
-            <div className="w-12 h-12 rounded-full bg-[#3c4a3e]/70 backdrop-blur-md border border-white/10 flex items-center justify-center p-2">
+          {/* Top Logo Section */}
+          <div className="relative z-10 flex items-center gap-3">
+            <button
+              onClick={() => setStep('role-selection')}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white/90 text-xs font-medium transition-all mb-3 border border-white/15"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Roles</span>
+            </button>
+          </div>
+
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-[#3c4a3e]/80 backdrop-blur-md border border-white/20 flex items-center justify-center p-2 shadow-xl">
               <img src={ayusetuEmblem} alt="AyuSetu Emblem" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white tracking-tight">AyuSetu</h1>
-              <p className="text-white/90 text-sm mt-0 font-medium">
+              <h1 className="text-3xl font-bold text-white tracking-tight font-serif">AyuSetu</h1>
+              <p className="text-white/90 text-sm font-medium">
                 Trusted Herbal Supply Chain for Bharat
               </p>
             </div>
           </div>
 
-          {/* Bottom Features Box - Smaller & Simpler */}
-          <div className="relative z-10 mb-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 p-4 max-w-[18rem] shadow-2xl">
-            <div className="flex items-center gap-3 pb-3 border-b border-white/10">
+          {/* Bottom Features Box */}
+          <div className="relative z-10 mb-4 bg-black/40 backdrop-blur-md rounded-2xl border border-white/15 p-4 max-w-xs shadow-2xl space-y-3">
+            <div className="flex items-center gap-3 pb-2 border-b border-white/10">
               <div className="w-6 h-6 rounded-full bg-emerald-600/90 flex items-center justify-center shrink-0">
                 <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
               </div>
               <span className="text-white/95 font-medium text-[13px]">Government Verified System</span>
             </div>
-            <div className="flex items-center gap-3 pt-3">
+            <div className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-full bg-emerald-600/90 flex items-center justify-center shrink-0">
                 <Heart className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
               </div>
@@ -608,64 +641,18 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
         </div>
 
         {/* Right Panel (60%) */}
-        <div className="w-full lg:w-[60%] flex flex-col justify-center px-6 py-4 sm:px-12 lg:px-24 overflow-hidden">
-
-          {!hasStarted ? (
-            <div className="w-full max-w-2xl mx-auto flex flex-col justify-center min-h-[60vh] animate-in fade-in slide-in-from-bottom-8 duration-700">
-
-              <div className="space-y-6">
-                <h2 className="text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-emerald-950 via-emerald-800 to-emerald-500 pb-4">
-                  Welcome to<br />AyuSetu.
-                </h2>
-                <div className="w-24 h-2 rounded-full bg-emerald-500/30" />
-                <p className="text-2xl lg:text-3xl font-medium text-emerald-800/80 leading-snug max-w-lg pt-4">
-                  Your trusted herbal supply chain ecosystem.
-                </p>
-              </div>
-
-              <div className="pt-16">
-                {/* Uiverse-style Get Started Button */}
-                <button
-                  onClick={() => setHasStarted(true)}
-                  className="group relative inline-flex h-16 w-64 items-center justify-center overflow-hidden rounded-full bg-emerald-600 font-medium text-neutral-50 shadow-[0_8px_30px_rgb(5,150,105,0.4)] transition-all duration-300 hover:bg-emerald-700 hover:shadow-[0_8px_30px_rgba(5,150,105,0.6)] hover:scale-[1.03] active:scale-[0.97]"
-                >
-                  <span className="mr-3 text-xl font-bold tracking-wider">Get Started</span>
-                  <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" strokeWidth={3} />
-                  <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
-                    <div className="relative h-full w-12 bg-white/20" />
-                  </div>
-                </button>
-              </div>
+        <div className="w-full lg:w-[60%] flex flex-col justify-center px-6 py-8 sm:px-12 lg:px-20 overflow-y-auto">
+          <div className="w-full max-w-md mx-auto space-y-4">
+            <div className="lg:hidden flex items-center justify-between pb-4 mb-2 border-b border-emerald-100">
+              <button
+                onClick={() => setStep('role-selection')}
+                className="flex items-center gap-1.5 text-emerald-800 text-xs font-semibold"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Roles</span>
+              </button>
+              <span className="text-xs font-bold text-emerald-950 font-serif">AyuSetu Portal</span>
             </div>
-          ) : (
-            <div className="w-full max-w-md mx-auto space-y-4">
-              {step === 'role-selection' && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="text-center lg:text-left mb-8">
-                    <h2 className="text-3xl font-bold text-emerald-950 tracking-tight">Select your role</h2>
-                    <p className="text-emerald-700/80 mt-2 font-medium">Choose how you participate in the network</p>
-                  </div>
-
-                  <div className="grid gap-4">
-                    {roles.map((role) => (
-                      <button
-                        key={role.id}
-                        onClick={() => handleRoleSelect(role.id)}
-                        className={`flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-emerald-500/30 transition-all duration-300 ${role.color} hover:shadow-lg group text-left w-full`}
-                      >
-                        <div className="w-12 h-12 flex items-center justify-center bg-white/50 rounded-xl text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                          {role.icon}
-                        </div>
-                        <div className="ml-4 flex-1">
-                          <h3 className="text-emerald-950 font-semibold">{role.label}</h3>
-                          <p className="text-emerald-800/70 text-sm">{role.description}</p>
-                        </div>
-                        <ChevronRight className="text-emerald-400 group-hover:text-emerald-600 transition-colors" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {step === 'credentials-entry' && selectedRole && (
                 <div className="animate-in slide-in-from-right-8 duration-500 max-h-full flex flex-col justify-center">
@@ -958,11 +945,10 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
 };
 
 export default AuthComponent;
