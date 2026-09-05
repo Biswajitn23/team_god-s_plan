@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -28,11 +28,11 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     {
       name: 'bhashini-to-sarvam-middleware',
-      configureServer(server) {
-        server.middlewares.use(async (req, res, next) => {
+      configureServer(server: ViteDevServer) {
+        server.middlewares.use(async (req: any, res: any, next: () => void) => {
           if (req.url && req.url.startsWith('/api-bhashini')) {
             let body = '';
-            req.on('data', (chunk) => { body += chunk; });
+            req.on('data', (chunk: any) => { body += chunk; });
             req.on('end', async () => {
               try {
                 const parsed = body ? JSON.parse(body) : {};
@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => ({
                       })
                     });
                     if (sarvamRes.ok) {
-                      const sarvamData = await sarvamRes.json();
+                      const sarvamData = await sarvamRes.json() as { translated_text?: string };
                       translatedText = sarvamData.translated_text || inputText;
                     }
                   } catch (err) {
