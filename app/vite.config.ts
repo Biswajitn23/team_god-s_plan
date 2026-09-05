@@ -6,13 +6,15 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "127.0.0.1",
+    host: "0.0.0.0",
     port: 8080,
-    hmr: {
-      host: "127.0.0.1",
-      port: 8080,
-    },
     proxy: {
+      '/api-sarvam': {
+        target: 'https://api.sarvam.ai',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-sarvam/, ''),
+        secure: true,
+      },
       '/api-bhashini': {
         target: 'https://dhruva-api.bhashini.gov.in',
         changeOrigin: true,

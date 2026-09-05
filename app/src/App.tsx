@@ -79,12 +79,14 @@ const AppContent = () => {
     localStorage.removeItem('currentUser');
   };
 
-  const isPublicView = location.pathname.startsWith('/view/');
+  const isPublicView = location.pathname.startsWith('/view/') || location.pathname.startsWith('/verify');
 
   if (isPublicView) {
     return (
       <Routes>
         <Route path="/view/:batch_id" element={<ViewCollection />} />
+        <Route path="/verify/:batch_id" element={<ViewCollection />} />
+        <Route path="/verify" element={<ViewCollection />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );

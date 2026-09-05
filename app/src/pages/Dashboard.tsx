@@ -8,14 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { Leaf, TrendingUp, CheckCircle, AlertCircle, Clock, Users, Package, Languages, RefreshCw, Download as DownloadIcon, Copy as CopyIcon, ShieldCheck, UserCheck, MapPin, Hash, Sparkles, PlusCircle, HelpCircle, MessageCircle, Bot, X, Volume2, VolumeX, ShoppingCart, Check } from 'lucide-react';
+import { Leaf, TrendingUp, CheckCircle, AlertCircle, Clock, Users, Package, Languages, RefreshCw, Download as DownloadIcon, Copy as CopyIcon, ShieldCheck, UserCheck, MapPin, Hash, Sparkles, PlusCircle, HelpCircle, MessageCircle, Bot, X, Volume2, VolumeX, ShoppingCart, Check, ExternalLink } from 'lucide-react';
 import { getCollections, initializeDemoData } from '../lib/localStorage';
 import QRCode from 'qrcode';
 import { useToast } from '../components/ui/use-toast';
 import { useTranslation } from '../context/useTranslation';
 import { useEffect, useState, useContext } from 'react';
 import { db } from '../lib/firebase';
-import { doc, onSnapshot, collection, getDocs, addDoc, query, where, getDocs as getDocs2 } from 'firebase/firestore';
+import { doc, onSnapshot, collection, getDocs, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
 import { SimpleChatbot } from '../components/chatbot/SimpleChatbot';
 import { BottomNav } from '../components/layout/BottomNav';
 import { TTSEnabledContext, useTTS } from '../context/TTSContext';
@@ -297,8 +297,10 @@ export const Dashboard = ({ onLogout, farmer: propFarmer }: any) => {
 
   const generateQRCode = async (batchId: string) => {
     try {
-      const qrUrl = `${window.location.origin}/view/${batchId}`;
-      const url = await QRCode.toDataURL(qrUrl);
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const host = isLocal ? `192.168.137.65:${window.location.port || '8080'}` : window.location.host;
+      const qrUrl = `${window.location.protocol}//${host}/view/${batchId}`;
+      const url = await QRCode.toDataURL(qrUrl, { width: 300, margin: 2 });
       setQrDataUrl(url);
       setShowQR(batchId);
     } catch (err) {
@@ -829,12 +831,36 @@ export const Dashboard = ({ onLogout, farmer: propFarmer }: any) => {
                 <h3 className="text-[10px] font-black text-emerald-900/40 dark:text-white/40 uppercase tracking-[0.2em] mb-2">{t('batch_id')}</h3>
                 <p className="text-sm font-mono font-bold text-emerald-950 dark:text-emerald-400 break-all bg-slate-50 dark:bg-white/5 p-4 rounded-2xl border border-emerald-50 dark:border-white/10">{showQR}</p>
               </div>
-              <button 
-                onClick={downloadQR}
-                className="w-full py-5 rounded-3xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-3"
-              >
-                <DownloadIcon size={18} /> {t('download_qr')}
-              </button>
+              <div className="space-y-3">
+                <a
+                  href={`/view/${showQR}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-4 rounded-3xl bg-white dark:bg-emerald-800 text-emerald-950 dark:text-white border-2 border-emerald-600 font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <ExternalLink size={16} className="text-emerald-600 dark:text-emerald-300" /> Open Verification Details (Preview)
+                </a>
+                <button 
+                  onClick={downloadQR}
+                  className="w-full py-4 rounded-3xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <DownloadIcon size={16} /> {t('download_qr')}
+                </button>
+                <button 
+                  onClick={() => {
+                    const host = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                      ? `192.168.137.65:${window.location.port || '8080'}` 
+                      : window.location.host;
+                    copyToClipboard(`${window.location.protocol}//${host}/view/${showQR}`);
+                  }}
+                  className="w-full py-3 rounded-2xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white font-bold text-[9px] uppercase tracking-wider hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                >
+                  <CopyIcon size={14} /> Copy Scannable Link
+                </button>
+              </div>
+              <p className="text-[9px] text-slate-400 dark:text-white/40 leading-tight">
+                📱 Scannable with Google Scan / Lens from any mobile phone on this Wi-Fi.
+              </p>
             </div>
           </div>
         </div>

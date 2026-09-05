@@ -1,6 +1,6 @@
 import React from "react";
 import { useTTS } from '../../context/TTSContext';
-import { Camera, MapPin, Clock, Leaf, Download, QrCode, Sparkles, Sprout, ArrowRight, ShieldCheck } from "lucide-react";
+import { Camera, MapPin, Clock, Leaf, Download, QrCode, Sparkles, Sprout, ArrowRight, ShieldCheck, ExternalLink } from "lucide-react";
 import { X } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 import { useTranslation } from "../../context/useTranslation";
@@ -115,8 +115,9 @@ export const CollectionEventForm: React.FC<CollectionEventFormProps> = ({ onSubm
 
   const generateQRCode = async (batchId: string, details: { species: string; quantity: number; location: string; created_at?: string }) => {
     try {
-      const baseUrl = window.location.origin;
-      const qrUrl = `${baseUrl}/view/${batchId}`;
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const host = isLocal ? `192.168.137.65:${window.location.port || '8080'}` : window.location.host;
+      const qrUrl = `${window.location.protocol}//${host}/view/${batchId}`;
       const qrDataUrl = await QRCode.toDataURL(qrUrl, { width: 256, margin: 2 });
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -439,17 +440,25 @@ export const CollectionEventForm: React.FC<CollectionEventFormProps> = ({ onSubm
                      </div>
 
                      <div className="space-y-3">
+                        <a
+                           href={`/view/${currentBatchId}`}
+                           target="_blank"
+                           rel="noreferrer"
+                           className="w-full py-4 rounded-2xl bg-white text-emerald-950 font-black uppercase tracking-widest text-xs hover:bg-emerald-50 transition-all shadow-xl flex items-center justify-center gap-2"
+                        >
+                           <ExternalLink size={16} /> Open Verification Details (Preview)
+                        </a>
                         <button
                            type="button"
                            onClick={downloadQRCode}
-                           className="w-full py-5 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-widest hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
+                           className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-widest hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 active:scale-95 text-xs flex items-center justify-center gap-2"
                         >
-                           <Download size={18} className="inline mr-2" /> Download QR
+                           <Download size={16} /> Download QR
                         </button>
                         <button
                            type="button"
                            onClick={() => setShowQRCode(false)}
-                           className="w-full py-5 rounded-2xl bg-white/10 text-white border border-white/20 font-black uppercase tracking-widest hover:bg-white/20 transition-all"
+                           className="w-full py-3 rounded-2xl bg-white/10 text-white border border-white/20 font-black uppercase tracking-widest hover:bg-white/20 transition-all text-xs"
                         >
                            Close
                         </button>
