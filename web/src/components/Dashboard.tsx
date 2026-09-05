@@ -9,11 +9,21 @@ import {
   LayoutDashboard,
   ShieldAlert,
   ChevronRight,
-  Database
+  Database,
+  Bell,
+  Home,
+  FileText,
+  Lock,
+  Radio,
+  Calendar,
+  Layers,
+  Phone,
+  Globe,
+  Leaf,
+  Sparkles
 } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '@/integrations/firebase/client';
-import ayusetuEmblem from '@/assets/ayusetu-emblem.png';
 
 // View imports
 import AggregatorView from './roles/AggregatorView';
@@ -52,173 +62,357 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
     return () => clearInterval(timer);
   }, []);
 
-  const roleDisplayNames = {
+  const roleDisplayNames: Record<string, string> = {
     aggregator: 'Aggregator / Collection',
     processor: 'Processor / Refinement',
     manufacturer: 'Manufacturer / Formulation',
-    distributor: 'Distributor / Logistics'
+    distributor: 'Distributor / Logistics',
+    farmer: 'Farmer / Grower Portal'
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex flex-col font-sans relative overflow-hidden">
-      {/* Background Decorators */}
-      <div className="absolute top-[-10%] left-[-5%] w-96 h-96 bg-emerald-400/20 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-teal-400/20 rounded-full blur-[100px] pointer-events-none" />
-      {/* 1. GLASSMORPHISM TOP NAV */}
-      <header className="bg-white/70 backdrop-blur-xl border-b border-emerald-200/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white border border-emerald-100/50 flex items-center justify-center p-1.5 shadow-sm">
-              <img src={ayusetuEmblem} alt="AyuSetu Emblem" className="w-full h-full object-contain drop-shadow-sm scale-110" />
+    <div className="min-h-screen bg-[#faf9f5] flex flex-col font-sans text-slate-800 select-none relative overflow-x-hidden">
+      {/* Background Decorative Grid */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
+
+      {/* ========================================================================= */}
+      {/* 1. OFFICIAL GOVT OF INDIA & AYUSH TOP HEADER                              */}
+      {/* ========================================================================= */}
+      <header className="bg-white border-b border-slate-200/90 relative z-30 px-4 sm:px-8 py-3">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between">
+          
+          {/* Left: Emblem of India + Ministry of Ayush + AyuSetu Brand */}
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-2.5">
+              <svg
+                className="w-8 h-10 sm:w-9 sm:h-11 text-slate-800"
+                viewBox="0 0 100 120"
+                fill="currentColor"
+                aria-label="Emblem of India"
+              >
+                <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z M50 12 C55 12 58 18 58 25 C58 32 55 38 50 38 C45 38 42 32 42 25 C42 18 45 12 50 12 Z M35 70 C35 60 42 50 50 50 C58 50 65 60 65 70 C65 78 58 86 50 86 C42 86 35 78 35 70 Z" />
+                <circle cx="50" cy="98" r="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                <rect x="25" y="110" width="50" height="3" rx="1.5" fill="currentColor" />
+              </svg>
+              <div className="flex flex-col leading-tight border-r border-slate-300 pr-3 sm:pr-4">
+                <span className="text-xs sm:text-sm font-black tracking-tight text-slate-900 font-serif">
+                  भारत सरकार
+                </span>
+                <span className="text-[11px] sm:text-xs font-bold text-slate-800">
+                  Government of India
+                </span>
+                <span className="text-[8px] sm:text-[9px] text-slate-500 font-serif tracking-wide mt-0.5">
+                  आयुष मंत्रालय / Ministry of Ayush
+                </span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-none text-emerald-950">
-                AyuSetu<span className="text-emerald-500">.</span>
-              </h1>
-              <p className="text-[10px] font-bold text-emerald-600/80 uppercase tracking-[0.3em] mt-1">
-                Govt. Traceability Node
-              </p>
+
+            {/* AyuSetu Brand */}
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xl sm:text-2xl font-serif font-black tracking-tight text-[#0d5c3a]">
+                    AyuSetu
+                  </span>
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-[#0d5c3a] flex items-center justify-center">
+                    <Leaf className="w-3 h-3" />
+                  </div>
+                </div>
+                <span className="text-[8px] sm:text-[9px] font-bold text-slate-500 tracking-wider uppercase">
+                  TRADITIONAL KNOWLEDGE FOR A HEALTHIER INDIA
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-8">
-            <div className="hidden lg:block text-right border-r border-emerald-200 pr-6 relative z-10">
-              <div className="text-lg font-mono font-bold text-emerald-900 leading-none">
-                {currentTime.toLocaleTimeString('en-IN', { hour12: true })}
+          {/* Right: Digital India, Viksit Bharat, Live Clock & Logout */}
+          <div className="flex items-center gap-3 sm:gap-6">
+            {/* Digital India */}
+            <div className="hidden md:flex items-center gap-2">
+              <div className="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full border-[2.5px] border-[#FF9933] border-t-[#138808] border-r-[#000080] flex items-center justify-center transform -rotate-45">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-tr from-[#000080] via-[#FF9933] to-[#138808]" />
+                </div>
               </div>
-              <div className="text-[10px] text-emerald-600 font-bold uppercase mt-1">
-                {currentTime.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' })}
+              <div className="flex flex-col text-left leading-tight">
+                <span className="text-xs font-black tracking-tight text-slate-900">Digital India</span>
+                <span className="text-[8px] text-slate-500 tracking-wide">Power To Empower</span>
               </div>
             </div>
 
+            {/* Viksit Bharat @2047 */}
+            <div className="hidden sm:flex items-center gap-1.5 bg-white/90 border border-slate-200/80 rounded-xl px-2.5 py-1 shadow-sm">
+              <div className="flex flex-col text-right leading-none">
+                <span className="text-[11px] font-black text-slate-800">Viksit Bharat</span>
+                <span className="text-[9px] font-bold text-[#FF9933]">@2047</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="w-3 h-0.5 rounded-full bg-[#FF9933]" />
+                <span className="w-3 h-0.5 rounded-full bg-slate-300" />
+                <span className="w-3 h-0.5 rounded-full bg-[#138808]" />
+              </div>
+            </div>
+
+            {/* Realtime Clock */}
+            <div className="hidden lg:flex flex-col text-right pr-2">
+              <span className="text-xs sm:text-sm font-mono font-bold text-slate-900">
+                {currentTime.toLocaleTimeString('en-IN', { hour12: true })}
+              </span>
+              <span className="text-[9px] font-semibold text-slate-500">
+                {currentTime.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+
+            {/* Notification Bell */}
+            <button 
+              aria-label="Notifications"
+              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors shadow-sm"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+
+            {/* Logout Button */}
             <Button
               onClick={onLogout}
-              className="bg-red-50 hover:bg-red-500 text-red-600 hover:text-white border border-red-200 hover:border-red-500 px-6 font-bold shadow-sm transition-all duration-300 relative z-10"
+              className="bg-[#e8f5e9] hover:bg-emerald-700 text-[#0d5c3a] hover:text-white border border-emerald-200/80 hover:border-emerald-700 px-4 py-2 font-bold text-xs rounded-xl shadow-sm transition-all duration-200 flex items-center gap-1.5"
             >
-              <LogOut size={18} className="mr-2" />
-              LOGOUT
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
             </Button>
           </div>
+
         </div>
       </header>
 
-      {/* 2. SUB-NAV / BREADCRUMBS (TRANSPARENT GLASS) */}
-      <div className="bg-white/40 backdrop-blur-md border-b border-emerald-200/40 py-3 shadow-sm relative z-40">
-        <div className="container mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-950 uppercase tracking-widest">
-            <LayoutDashboard size={14} className="text-emerald-600" />
-            <span className="text-emerald-950">{roleDisplayNames[userRole as keyof typeof roleDisplayNames] || userRole}</span>
+      {/* ========================================================================= */}
+      {/* 2. SUB-HEADER RIBBON (DEEP AYUSH GREEN)                                  */}
+      {/* ========================================================================= */}
+      <div className="bg-[#1b4d3e] text-emerald-100 py-2.5 px-4 sm:px-8 shadow-inner relative z-20">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 font-medium">
+            <Home className="w-3.5 h-3.5 text-emerald-300" />
+            <span className="text-emerald-300/60 font-mono">&gt;</span>
+            <span className="text-white font-semibold tracking-wide">
+              {roleDisplayNames[userRole] || userRole}
+            </span>
           </div>
-          <div className="flex items-center gap-4 text-[11px] font-bold">
-            <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-              <Database size={12} />
-              <span>BLOCKCHAIN SYNCED</span>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-[#0f3d2e] border border-emerald-600/40 text-emerald-300 px-3 py-1 rounded-full text-[11px] font-semibold">
+              <Database className="w-3 h-3" />
+              <span>Blockchain Synced</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
           </div>
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-10 flex-grow relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      {/* ========================================================================= */}
+      {/* 3. MAIN WORKSPACE AREA                                                   */}
+      {/* ========================================================================= */}
+      <main className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-          {/* 3. SIDE PROFILE CARD (GLASS) */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-emerald-200/60 shadow-xl shadow-emerald-900/5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 blur-2xl rounded-full translate-x-10 -translate-y-10 transition-transform group-hover:scale-150 duration-700"></div>
-
-              <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="w-24 h-24 rounded-2xl bg-emerald-950 flex items-center justify-center mb-4 shadow-xl border-4 border-white shrink-0 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 to-transparent"></div>
-                  <span className="text-4xl font-black text-white relative z-10 uppercase">
-                    {userId ? userId.charAt(0) : 'U'}
-                  </span>
+          {/* ------------------------------------------------------------------- */}
+          {/* LEFT SIDEBAR: PROFILE & SYSTEM VERIFICATION (3 COLS)                */}
+          {/* ------------------------------------------------------------------- */}
+          <div className="lg:col-span-3 space-y-4">
+            
+            {/* User Profile Card */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm relative overflow-hidden">
+              <div className="flex flex-col items-center text-center">
+                {/* Avatar Badge */}
+                <div className="w-20 h-20 rounded-full bg-[#1b4d3e] text-white flex items-center justify-center text-3xl font-black shadow-md border-4 border-emerald-50 mb-3">
+                  {userId ? userId.charAt(0).toUpperCase() : 'A'}
                 </div>
-                <h2 className="text-xl font-bold truncate w-full text-emerald-950">{userId}</h2>
-                <Badge className="mt-3 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors mb-2">
+
+                <h2 className="text-xl font-bold font-mono text-slate-900 tracking-tight">
+                  {userId}
+                </h2>
+                
+                <span className="inline-block mt-1 px-3.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-[#0d5c3a] capitalize">
                   {userRole}
-                </Badge>
+                </span>
 
                 {profileData && (
-                  <div className="flex flex-col items-center gap-0.5 mt-2 animate-in fade-in zoom-in duration-500">
-                    <p className="text-[10px] sm:text-xs font-bold text-emerald-950 text-center leading-tight">{profileData.name}</p>
-                    <p className="text-[9px] sm:text-[11px] font-semibold text-emerald-600/80 uppercase tracking-wide">
-                      📍 {profileData.location}
-                    </p>
+                  <div className="mt-2 text-center">
+                    <p className="text-xs font-bold text-slate-800">{profileData.name}</p>
+                    <p className="text-[10px] text-slate-500 font-medium">📍 {profileData.location}</p>
                   </div>
                 )}
 
-                <div className="w-full mt-8 pt-8 border-t border-emerald-100/60 space-y-3 text-emerald-900">
-                  <div className="flex justify-between items-center bg-white/50 px-4 py-2 rounded-xl border border-emerald-50">
-                    <span className="text-[10px] text-emerald-600/80 font-bold uppercase">Terminal ID</span>
-                    <span className="text-xs font-mono text-emerald-700 font-bold">ST-{userId.split('-')[1] || '001'}</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-white/50 px-4 py-2 rounded-xl border border-emerald-50">
-                    <span className="text-[10px] text-emerald-600/80 font-bold uppercase">Clearance</span>
-                    <span className="text-xs font-mono text-emerald-700 font-bold uppercase">Alpha</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-white/50 px-4 py-2 rounded-xl border border-emerald-50">
-                    <span className="text-[10px] text-emerald-600/80 font-bold uppercase">Joined</span>
-                    <span className="text-xs font-mono text-emerald-700 font-bold">Feb 2024</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-white/50 px-4 py-2 rounded-xl border border-emerald-50">
-                    <span className="text-[10px] text-emerald-600/80 font-bold uppercase">Integrity Sync</span>
-                    <span className="text-[10px] text-emerald-600 font-bold uppercase">Active</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-white/50 px-4 py-2 rounded-xl border border-emerald-50">
-                    <span className="text-[10px] text-emerald-600/80 font-bold uppercase">Encryption</span>
-                    <span className="text-xs font-mono text-emerald-700 font-bold uppercase">AES-256</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-white/50 px-4 py-2 rounded-xl border border-emerald-50">
-                    <span className="text-[10px] text-emerald-600/80 font-bold uppercase">Node Status</span>
-                    <span className="text-[10px] text-emerald-600 font-black flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE
+                {/* Metadata Table */}
+                <div className="w-full mt-6 pt-5 border-t border-slate-100 space-y-2.5 text-left text-xs">
+                  <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Terminal ID</span>
+                    </div>
+                    <span className="font-mono font-bold text-slate-800">
+                      ST-{userId.split('-')[1] || '1001'}
                     </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Clearance</span>
+                    </div>
+                    <span className="font-bold text-slate-800 uppercase text-[11px]">
+                      ALPHA
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Joined On</span>
+                    </div>
+                    <span className="font-medium text-slate-800">
+                      Feb 2024
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Layers className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Integrity Sync</span>
+                    </div>
+                    <span className="font-bold text-emerald-700">
+                      Active
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Encryption</span>
+                    </div>
+                    <span className="font-mono font-bold text-slate-800 text-[11px]">
+                      AES-256
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Radio className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Node Status</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Online</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 p-5 bg-white/80 backdrop-blur-xl border border-emerald-200/60 shadow-lg shadow-emerald-900/5 rounded-2xl flex items-start gap-4 transition-all hover:bg-white relative overflow-hidden group">
-              <ShieldAlert size={20} className="text-emerald-500 mt-0.5 shrink-0" />
-              <p className="text-[11px] text-emerald-800 font-medium leading-relaxed relative z-10">
-                <strong>System Advisory:</strong> Ensure all batch records are cryptographically signed before 18:00 IST.
-              </p>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-100/30 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            {/* Government Verified Node Card */}
+            <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-sm flex items-center justify-between gap-3 hover:border-emerald-400 transition-all cursor-pointer group">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0d5c3a] text-white flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 leading-tight">
+                    Government Verified Node
+                  </h4>
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                    Authorized under Ministry of Ayush
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-colors" />
+            </div>
+
+            {/* Ayush Aatmanirbhar Bharat Poster Card */}
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-amber-50 via-orange-50 to-emerald-50 p-4 border border-orange-200/60 shadow-sm">
+              <div className="flex items-center justify-between gap-2">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wide">
+                    आयुष से
+                  </span>
+                  <h4 className="text-sm sm:text-base font-black text-slate-900 font-serif leading-tight">
+                    आत्मनिर्भर भारत
+                  </h4>
+                  <p className="text-[9px] text-slate-600 font-medium">
+                    Our Herbs. Our Heritage. A Healthier Future.
+                  </p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center shrink-0">
+                  <Leaf className="w-5 h-5 text-[#0d5c3a]" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ------------------------------------------------------------------- */}
+          {/* RIGHT MAIN WORKSPACE (9 COLS)                                       */}
+          {/* ------------------------------------------------------------------- */}
+          <div className="lg:col-span-9 space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 sm:p-7 relative overflow-hidden">
+              {/* Render Selected Role View */}
+              {userRole === 'aggregator' && <AggregatorView userId={userId} />}
+              {userRole === 'processor' && <ProcessorView userId={userId} />}
+              {userRole === 'manufacturer' && <ManufacturerView userId={userId} />}
+              {userRole === 'distributor' && <DistributorView userId={userId} />}
+              {userRole === 'farmer' && <FarmerView userId={userId} />}
             </div>
           </div>
 
-          {/* 4. MAIN CONTENT AREA (GLASS) */}
-          <div className="lg:col-span-3 h-full">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-emerald-200/60 shadow-xl shadow-emerald-900/5 p-4 sm:p-8 h-full min-h-[600px] relative overflow-hidden transition-all duration-300">
-              <div className="relative z-10 h-full">
-                {/* Dynamically Render Views */}
-                {userRole === 'aggregator' && <AggregatorView userId={userId} />}
-                {userRole === 'processor' && <ProcessorView userId={userId} />}
-                {userRole === 'manufacturer' && <ManufacturerView userId={userId} />}
-                {userRole === 'distributor' && <DistributorView userId={userId} />}
-                {userRole === 'farmer' && <FarmerView userId={userId} />}
-              </div>
-
-              {/* Subtle Branding Watermark */}
-              <div className="absolute bottom-10 right-10 opacity-[0.03] select-none pointer-events-none text-emerald-900">
-                <ShieldCheck size={280} />
-              </div>
-            </div>
-          </div>
         </div>
       </main>
 
-      {/* 5. MINIMALIST FOOTER */}
-      <footer className="bg-white/40 backdrop-blur-md border-t border-emerald-200/40 py-8 relative z-10">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-6">
-            <div className="text-[10px] font-black text-emerald-900/60 uppercase tracking-widest">AyuSetu Traceability Platform</div>
+      {/* ========================================================================= */}
+      {/* 4. OFFICIAL FOOTER (AYUSH GOVERNMENT OF INDIA)                           */}
+      {/* ========================================================================= */}
+      <footer className="bg-white border-t border-slate-200/90 py-5 px-4 sm:px-8 relative z-20 text-slate-600 text-xs mt-auto">
+        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          {/* Left: Ministry of Ayush */}
+          <div className="flex items-center gap-3">
+            <svg
+              className="w-7 h-9 text-slate-700"
+              viewBox="0 0 100 120"
+              fill="currentColor"
+            >
+              <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z M50 12 C55 12 58 18 58 25 C58 32 55 38 50 38 C45 38 42 32 42 25 C42 18 45 12 50 12 Z M35 70 C35 60 42 50 50 50 C58 50 65 60 65 70 C65 78 58 86 50 86 C42 86 35 78 35 70 Z" />
+            </svg>
+            <div className="flex flex-col text-left leading-tight">
+              <span className="font-bold text-slate-900">Ministry of Ayush</span>
+              <span className="text-[10px] text-slate-500">Government of India</span>
+            </div>
           </div>
-          <div className="text-[10px] font-bold text-emerald-900/40 uppercase">
-            Ministry of AYUSH • © 2026 Government of India
+
+          {/* Center: Legal & Help Links */}
+          <div className="flex items-center gap-5 text-slate-600 font-medium text-xs">
+            <a href="#" className="hover:text-emerald-800 transition-colors">Terms of Use</a>
+            <span>|</span>
+            <a href="#" className="hover:text-emerald-800 transition-colors">Privacy Policy</a>
+            <span>|</span>
+            <a href="#" className="hover:text-emerald-800 transition-colors">Help & Support</a>
           </div>
+
+          {/* Right: Toll Free & Official Website */}
+          <div className="flex items-center gap-6 text-xs">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-[#0d5c3a]" />
+              <div className="flex flex-col text-left leading-tight">
+                <span className="font-mono font-bold text-slate-800">1800-120-8040</span>
+                <span className="text-[9px] text-slate-500">(Toll Free)</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 text-slate-700">
+              <Globe className="w-4 h-4 text-[#0d5c3a]" />
+              <span className="font-semibold text-slate-800">www.ayush.gov.in</span>
+            </div>
+          </div>
+
         </div>
       </footer>
+
     </div>
   );
 };
