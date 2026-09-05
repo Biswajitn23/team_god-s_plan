@@ -40,6 +40,9 @@ import QRCode from 'react-qr-code';
 
 import ashwagandhaBottleImg from '@/assets/ashwagandha-product.jpg';
 import thakurYograjImg from '@/assets/thakur-yograj-product.png';
+import thakurYograj1 from '@/assets/thakur-yograj-1.png';
+import thakurYograj2 from '@/assets/thakur-yograj-2.png';
+import thakurYograj3 from '@/assets/thakur-yograj-3.png';
 import emblemImg from '@/assets/ayusetu-emblem.png';
 
 interface BatchData {
@@ -424,9 +427,14 @@ const PublicVerifyPage = () => {
   const mrpPrice = batch?.metadata?.mrp || (isThakur ? '₹499.00' : '₹395.00');
   const netQuantity = isThakur ? '250 ml (Net Vol. 250ml)' : (typeof batch?.quantity === 'number' ? `${batch.quantity} units` : (batch?.quantity || '80 Tablets (60+20 Special Offer Pack)'));
 
-  // Product Gallery Images
-  const galleryImages = [
-    { src: isThakur ? thakurYograjImg : ashwagandhaBottleImg, alt: isThakur ? 'Thakur Yograj Herbal Hair Oil Pack Shot' : 'Primary Product Pack Shot' },
+  // Product Gallery Images - All 3 packaging photos + official seal
+  const galleryImages = isThakur ? [
+    { src: thakurYograj1, alt: 'Thakur Yograj Herbal Hair Oil - Box & 250ml Bottle Front' },
+    { src: thakurYograj2, alt: 'Thakur Yograj Herbal Hair Oil - Formulation & Ingredients Panel' },
+    { src: thakurYograj3, alt: 'Thakur Yograj Herbal Hair Oil - Usage & Manufacturing Details' },
+    { src: emblemImg, alt: 'Official AYUSH & DataKart Seal' }
+  ] : [
+    { src: ashwagandhaBottleImg, alt: 'Primary Product Pack Shot' },
     { src: emblemImg, alt: 'Official AYUSH & DataKart Seal' }
   ];
 

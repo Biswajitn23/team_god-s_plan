@@ -36,6 +36,9 @@ import { db } from "../../lib/firebase";
 import QRCode from "qrcode";
 import ashwagandhaBottleImg from "../../assets/ashwagandha-product.jpg";
 import thakurYograjImg from "../../assets/thakur-yograj-product.png";
+import thakurYograj1 from "../../assets/thakur-yograj-1.png";
+import thakurYograj2 from "../../assets/thakur-yograj-2.png";
+import thakurYograj3 from "../../assets/thakur-yograj-3.png";
 import emblemImg from "../../assets/ayusetu-emblem.png";
 
 interface BatchData {
@@ -103,6 +106,17 @@ export default function ViewCollection() {
     currentId?.toUpperCase().includes('TY-') ||
     currentId === '8906148291045'
   );
+
+  // All 3 user-provided packaging photos + official seal
+  const galleryImages = isThakur ? [
+    { src: thakurYograj1, alt: 'Thakur Yograj Herbal Hair Oil - Box & Bottle Pack Shot' },
+    { src: thakurYograj2, alt: 'Thakur Yograj Herbal Hair Oil - Side Panel & Formulation' },
+    { src: thakurYograj3, alt: 'Thakur Yograj Herbal Hair Oil - Usage & Batch Details' },
+    { src: emblemImg, alt: 'Official AYUSH & DataKart Seal' }
+  ] : [
+    { src: ashwagandhaBottleImg, alt: 'Primary Product Pack Shot' },
+    { src: emblemImg, alt: 'Official AYUSH & DataKart Seal' }
+  ];
 
   // Generate target verification URL that the QR code will open when scanned
   const getVerifyUrl = useCallback((mode: 'google' | 'mobile' | 'current') => {
@@ -524,13 +538,30 @@ export default function ViewCollection() {
                 <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
                   <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center p-4">
                     <img 
-                      src={isThakur ? thakurYograjImg : ashwagandhaBottleImg} 
+                      src={galleryImages[selectedImageIndex]?.src || (isThakur ? thakurYograjImg : ashwagandhaBottleImg)} 
                       alt={batch.product_name || "Product Pack Shot"} 
                       className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
                       Verified Pack
                     </div>
+                  </div>
+
+                  {/* Interactive 3-Photo Thumbnail Row */}
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    {galleryImages.map((img, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedImageIndex(idx)}
+                        className={`w-14 h-14 rounded-xl border-2 p-1 bg-slate-50 transition-all ${
+                          selectedImageIndex === idx ? 'border-emerald-600 shadow-md scale-105' : 'border-slate-200 hover:border-slate-300 opacity-70'
+                        }`}
+                        title={img.alt}
+                      >
+                        <img src={img.src} alt={img.alt} className="w-full h-full object-contain" />
+                      </button>
+                    ))}
                   </div>
 
                   {isThakur && (
