@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PublicVerifyPage from "./pages/PublicVerifyPage";
+import VerifyProductLandingPage from "./pages/VerifyProductLandingPage";
+import DigitalPassportPage from "./pages/DigitalPassportPage";
 import { collection, getDocs, addDoc, query, limit } from 'firebase/firestore';
 import { firestore } from '@/integrations/firebase/client';
 
@@ -130,6 +132,8 @@ const App = () => {
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/verify-product" element={<VerifyProductLandingPage />} />
+            <Route path="/verify-product/passport" element={<DigitalPassportPage />} />
             <Route path="/verify" element={<PublicVerifyPage />} />
             <Route path="/verify/:batchId" element={<PublicVerifyPage />} />
             <Route path="/view" element={<PublicVerifyPage />} />

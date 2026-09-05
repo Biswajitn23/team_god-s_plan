@@ -309,11 +309,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
 
               {/* Public Consumer Quick Verify Link */}
               <button
-                onClick={() => navigate('/verify')}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm shadow-sm hover:shadow transition-all"
+                id="verify-product-btn"
+                onClick={() => navigate('/verify-product')}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
               >
                 <QrCode className="w-4 h-4 text-[#0d5c3a]" />
-                <span>Verify Herb Batch / QR</span>
+                <span>Verify Product</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700" />
               </button>
             </div>
