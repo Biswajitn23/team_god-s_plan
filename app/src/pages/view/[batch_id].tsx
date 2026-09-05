@@ -82,7 +82,7 @@ export default function ViewCollection() {
   const [history, setHistory] = useState<BatchHistoryItem[]>([]);
   const [searched, setSearched] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
-  const [qrMode, setQrMode] = useState<'mobile' | 'current' | 'brand'>('mobile');
+  const [qrMode, setQrMode] = useState<'google' | 'mobile' | 'current'>('google');
 
   // Smart Consumer Active Tab State
   const [activeTab, setActiveTab] = useState<'overview' | 'ingredients' | 'traceability' | 'quality' | 'manufacturer' | 'feedback'>('overview');
@@ -105,15 +105,15 @@ export default function ViewCollection() {
   );
 
   // Generate target verification URL that the QR code will open when scanned
-  const getVerifyUrl = useCallback((mode: 'mobile' | 'current' | 'brand') => {
+  const getVerifyUrl = useCallback((mode: 'google' | 'mobile' | 'current') => {
     const id = batch?.batch_id || currentId || (isThakur ? 'TY-HHO-250' : '8908014928452');
+    if (mode === 'google') {
+      // Direct live verification link scannable by Google Scan / Google Lens
+      return `https://web-lemon-psi-69.vercel.app/verify/${id}`;
+    }
     if (mode === 'mobile') {
       // Local network IP: allows any phone on Wi-Fi scanning with Google Scan / Lens to directly open this verify page
       return `http://192.168.137.65:8080/verify/${id}`;
-    }
-    if (mode === 'brand') {
-      // Direct verification path on official brand portal
-      return `https://thakuryograj.com/verify/${id}`;
     }
     // Browser origin (e.g. localhost or deployed domain)
     return `${window.location.origin}/verify/${id}`;
@@ -272,7 +272,7 @@ export default function ViewCollection() {
                 tagline: "Get Smooth, Silky Healthy Hair | Long Hair Don't Care",
                 claims: "100% AYURVEDIC | CHEMICAL FREE | HAIRS STRENGTHENING",
                 website: "thakuryograj.com",
-                verifyUrl: "https://thakuryograj.com/verify/TY-HHO-250",
+                verifyUrl: "https://web-lemon-psi-69.vercel.app/verify/TY-HHO-250",
                 mrp: '₹499.00',
                 netVol: '250ml',
                 fssai: 'AYU-MH-2023-88741 / GMP Certified Facility',
@@ -587,39 +587,39 @@ export default function ViewCollection() {
                   {/* Scannable QR Code */}
                   <div className="border border-emerald-200 rounded-2xl p-4 bg-gradient-to-b from-emerald-50/70 to-teal-50/30 text-center space-y-3 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-emerald-950 uppercase tracking-widest block">Scannable Verification QR</span>
-                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Google Scan Ready</span>
+                      <span className="text-[10px] font-black text-emerald-950 uppercase tracking-widest block">Google Scan QR</span>
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Google Scan</span>
                     </div>
 
                     <p className="text-[11px] text-slate-600 leading-snug">
-                      Scan with <strong>Google Lens / Google Scan</strong> or phone camera to open this product verification page:
+                      Scan with <strong>Google Scan / Google Lens</strong> or phone camera to verify this product:
                     </p>
 
                     {/* Mode Selector */}
                     <div className="flex bg-white/90 p-0.5 rounded-xl border border-emerald-200 text-[10px] font-bold shadow-xs">
                       <button
                         type="button"
+                        onClick={() => setQrMode('google')}
+                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'google' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
+                        title="Google Scan Official Verification URL"
+                      >
+                        🔍 Google Scan
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setQrMode('mobile')}
                         className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'mobile' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Local Wi-Fi Network URL (Scannable from phone right now)"
+                        title="Local Wi-Fi Network URL (Scannable on local network)"
                       >
-                        📱 Mobile Wi-Fi
+                        📱 Local Wi-Fi
                       </button>
                       <button
                         type="button"
                         onClick={() => setQrMode('current')}
                         className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'current' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Browser Origin URL"
+                        title="Localhost Domain"
                       >
-                        🌐 App URL
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('brand')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'brand' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Official Brand Web Portal"
-                      >
-                        🏷️ thakuryograj.com
+                        🌐 Localhost
                       </button>
                     </div>
 

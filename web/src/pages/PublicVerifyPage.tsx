@@ -245,7 +245,7 @@ const PublicVerifyPage = () => {
               tagline: "Get Smooth, Silky Healthy Hair | Long Hair Don't Care",
               claims: "100% AYURVEDIC | CHEMICAL FREE | HAIRS STRENGTHENING",
               website: "thakuryograj.com",
-              verifyUrl: "https://thakuryograj.com/verify/TY-HHO-250",
+              verifyUrl: "https://web-lemon-psi-69.vercel.app/verify/TY-HHO-250",
               mrp: '₹499.00',
               netVol: '250ml',
               fssai: 'AYU-MH-2023-88741 / GMP Certified Facility',
@@ -401,15 +401,15 @@ const PublicVerifyPage = () => {
     currentId === '8906148291045'
   );
 
-  const [qrMode, setQrMode] = useState<'mobile' | 'current' | 'brand'>('mobile');
+  const [qrMode, setQrMode] = useState<'google' | 'mobile' | 'current'>('google');
 
-  const getVerifyUrl = (mode: 'mobile' | 'current' | 'brand') => {
+  const getVerifyUrl = (mode: 'google' | 'mobile' | 'current') => {
     const id = batch?.batch_id || currentId || (isThakur ? 'TY-HHO-250' : '8908014928452');
+    if (mode === 'google') {
+      return `https://web-lemon-psi-69.vercel.app/verify/${id}`;
+    }
     if (mode === 'mobile') {
       return `http://192.168.137.65:8080/verify/${id}`;
-    }
-    if (mode === 'brand') {
-      return `https://thakuryograj.com/verify/${id}`;
     }
     return `${window.location.origin}/verify/${id}`;
   };
@@ -651,39 +651,39 @@ const PublicVerifyPage = () => {
                   {/* Scannable 2D QR Code Token with Download / Save Button */}
                   <div className="w-full max-w-[300px] sm:max-w-[360px] mt-3 sm:mt-4 p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest block">Scannable Verification QR</span>
-                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Google Scan Ready</span>
+                      <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest block">Google Scan QR</span>
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Google Scan</span>
                     </div>
 
                     <p className="text-[11px] text-slate-500 text-left">
-                      Scan with <strong>Google Lens / Google Scan</strong> or phone camera to verify this product:
+                      Scan with <strong>Google Scan / Google Lens</strong> or phone camera to verify this product:
                     </p>
 
                     {/* Mode Selector */}
                     <div className="flex bg-slate-100 p-0.5 rounded-xl text-[10px] font-bold">
                       <button
                         type="button"
+                        onClick={() => setQrMode('google')}
+                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'google' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
+                        title="Google Scan Official Verification URL"
+                      >
+                        🔍 Google Scan
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setQrMode('mobile')}
                         className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'mobile' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Local Network IP: scan with phone connected to Wi-Fi"
+                        title="Local Wi-Fi Network URL"
                       >
-                        📱 Mobile Wi-Fi
+                        📱 Local Wi-Fi
                       </button>
                       <button
                         type="button"
                         onClick={() => setQrMode('current')}
                         className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'current' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Browser origin URL"
+                        title="Localhost Domain"
                       >
-                        🌐 App URL
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('brand')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'brand' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Official Brand Website"
-                      >
-                        🏷️ thakuryograj.com
+                        🌐 Localhost
                       </button>
                     </div>
 

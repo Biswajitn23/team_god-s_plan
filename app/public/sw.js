@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ayusetu-v1.0.0';
+const CACHE_NAME = 'ayusetu-v1.0.2';
 const STATIC_CACHE_URLS = [
   '/',
   '/manifest.json',
@@ -58,6 +58,20 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // In development or for vite modules, always use network directly
+  if (
+    url.hostname === 'localhost' || 
+    url.hostname === '127.0.0.1' ||
+    url.pathname.includes('@vite') ||
+    url.pathname.includes('@fs') ||
+    url.pathname.includes('/src/') ||
+    url.pathname.includes('chunk-') ||
+    url.pathname.startsWith('/api-')
+  ) {
+    event.respondWith(fetch(request));
+    return;
+  }
 
   // Handle navigation requests (pages)
   if (request.mode === 'navigate') {
