@@ -19,4 +19,4 @@ If you discover a security vulnerability within `team_god-s_plan`, please report
 
 We will acknowledge receipt of your vulnerability report within 48 hours and work with you to coordinate a timely fix and disclosure.
 
-Thank you for helping keep `team_god-s_plan` and its users safe!
+Thank you for helping keep `team_god-s_plan` and its users safe !
