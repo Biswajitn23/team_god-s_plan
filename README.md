@@ -9,18 +9,38 @@
 </p>
 
 <p align="center">
-  <b>🌱 Farmer &nbsp;→&nbsp; 📦 Aggregator &nbsp;→&nbsp; 🚚 Distributor &nbsp;→&nbsp; ⚙️ Processor &nbsp;→&nbsp; 🏭 Manufacturer &nbsp;→&nbsp; 🔎 Consumer</b>
+  <b>🌱 Farmer → 📦 Aggregator → 🚚 Distributor → ⚙️ Processor → 🏭 Manufacturer → 🔎 Consumer</b>
 </p>
 
 ---
 
-## 🚀 Overview
+## 🚀 Live Applications
 
-**Ayu-Setu** is a digital platform designed to bring transparency, traceability, accessibility, and market connectivity to India's herbal and medicinal plant supply chain.
+### 📱 Farmer Application
+
+**Ayu-Setu Farmer App**
+
+👉 **https://ayusetuapp.vercel.app/**
+
+The farmer-facing application enables collection registration, batch creation, QR generation, multilingual interaction, and access to digital records.
+
+### 🌐 Supply Chain Website
+
+**Ayu-Setu Supply Chain Portal**
+
+👉 **https://web-lemon-psi-69.vercel.app/**
+
+The supply-chain portal provides role-based interfaces for Farmers, Aggregators, Distributors, Processors, and Manufacturers, along with public verification.
+
+---
+
+# 🎯 Overview
+
+**Ayu-Setu** is a digital traceability and supply-chain platform designed to bring transparency, accessibility, verification, and connectivity to India's herbal and medicinal plant ecosystem.
 
 The platform connects different stakeholders through a common digital ecosystem and gives each batch a unique digital identity that can be used throughout its journey.
 
-### The core idea is simple:
+### The core idea:
 
 ```text
 🌱 Origin
@@ -49,22 +69,22 @@ Ayu-Setu consists of **two interconnected applications**:
 
 # 🎯 Problem
 
-India has a vast ecosystem of medicinal plants, herbs, traditional products, farmers, collectors, processors and manufacturers.
+India has a vast ecosystem of medicinal plants, herbs, traditional products, farmers, collectors, processors, and manufacturers.
 
 However, information across the supply chain can become fragmented.
 
-This creates problems such as:
+This creates challenges such as:
 
 * Lack of end-to-end traceability
 * Fragmented batch records
 * Difficulty verifying origin
 * Manual record keeping
 * Limited visibility between stakeholders
-* Limited market connectivity for farmers
-* Language barriers for users
+* Limited market connectivity
+* Language barriers
 * Difficulty establishing trust in the final product
 
-When information is disconnected, it becomes difficult to answer a simple question:
+When information is disconnected, it becomes difficult to answer one important question:
 
 > **"Where did this product actually come from?"**
 
@@ -106,7 +126,9 @@ As the batch moves through different stages, its information can be connected to
           🔎 PUBLIC VERIFICATION
 ```
 
-The objective is to make **trust travel with the product**.
+### Our principle:
+
+> **Trust should travel with the product.**
 
 ---
 
@@ -155,13 +177,17 @@ Directory:
 /app
 ```
 
-The farmer application is designed for field-level users and provides a simplified interface for registering collections, managing batches, accessing records and interacting with the platform.
+### Live App
+
+👉 **https://ayusetuapp.vercel.app/**
+
+The farmer application is designed for field-level users and provides a simplified interface for registering collections, managing batches, accessing records, and interacting with the platform.
 
 ## Key Features
 
 ### 👨‍🌾 Farmer Authentication
 
-Secure authentication and farmer-specific access through the application's authentication context.
+Authentication and farmer-specific access are handled through:
 
 ```text
 src/context/AuthContext.tsx
@@ -172,7 +198,7 @@ src/pages/Login.tsx
 
 ### 🌱 Collection Registration
 
-Farmers can register collection events digitally.
+Farmers can digitally register collection events through:
 
 ```text
 src/components/forms/CollectionEventForm.tsx
@@ -192,25 +218,25 @@ The **batch acts as the core traceability unit** of the platform.
 
 ### 🔳 QR Code Generation
 
-The application contains a dedicated QR generator:
+The application contains a dedicated QR generation component:
 
 ```text
 src/components/QRGenerator.tsx
 ```
 
-QR codes can be associated with batches and used for later verification.
+QR codes can be associated with batches and used for verification.
 
 ---
 
 ### 🔎 Public Batch Verification
 
-The application contains a dynamic batch verification route:
+The farmer application contains a dynamic verification route:
 
 ```text
 src/pages/view/[batch_id].tsx
 ```
 
-The basic flow is:
+Basic flow:
 
 ```text
 Scan QR
@@ -228,7 +254,7 @@ Batch Information
 
 Ayu-Setu is designed for India's multilingual user base.
 
-Current translation resources include:
+Supported language resources include:
 
 * English
 * Hindi
@@ -242,7 +268,7 @@ Current translation resources include:
 * Tamil
 * Telugu
 
-Translation files are maintained under:
+Translation resources are maintained under:
 
 ```text
 src/translations/
@@ -253,7 +279,7 @@ public/translations/
 
 ### 🗣️ Language & Voice Support
 
-The platform contains dedicated language and text-to-speech architecture.
+The platform contains dedicated language and text-to-speech architecture:
 
 ```text
 src/context/LanguageContext.tsx
@@ -262,7 +288,7 @@ src/services/translation.ts
 src/services/bhashini.ts
 ```
 
-This helps make the system more accessible to users who may prefer regional languages or voice interaction.
+This improves accessibility for users across different Indian languages.
 
 ---
 
@@ -275,10 +301,11 @@ src/services/
 ├── ai.ts
 ├── gemini.ts
 ├── mockAi.ts
-└── openrouter.ts
+├── openrouter.ts
+└── translation.ts
 ```
 
-This allows AI-powered capabilities to be extended without tightly coupling the application to a single provider.
+This allows AI-powered functionality to be extended without tightly coupling the application to a single provider.
 
 ---
 
@@ -290,7 +317,11 @@ Directory:
 /web
 ```
 
-The second application provides role-based interfaces for the wider supply chain.
+### Live Website
+
+👉 **https://web-lemon-psi-69.vercel.app/**
+
+The supply-chain portal provides role-based interfaces for different participants in the herbal supply chain.
 
 ### Supported Roles
 
@@ -312,13 +343,11 @@ web/src/components/roles/
 
 ## 📦 Aggregator
 
-Aggregators can operate between farmers and downstream stakeholders.
+The aggregator represents the connection between farmers and downstream supply-chain stakeholders.
 
 ```text
 web/src/components/roles/AggregatorView.tsx
 ```
-
-The aggregator layer helps organize farmer and batch-related operations.
 
 ---
 
@@ -334,7 +363,7 @@ web/src/components/roles/DistributorView.tsx
 
 ## ⚙️ Processor
 
-The processor represents the transformation or processing stage of the supply chain.
+The processor represents the processing or transformation stage.
 
 ```text
 web/src/components/roles/ProcessorView.tsx
@@ -370,8 +399,6 @@ The supply-chain portal contains a dedicated public verification page:
 web/src/pages/PublicVerifyPage.tsx
 ```
 
-This provides a public-facing interface for verifying batch/product information.
-
 ### Verification Flow
 
 ```text
@@ -389,6 +416,8 @@ This provides a public-facing interface for verifying batch/product information.
                   ▼
               ✅ TRUST
 ```
+
+This provides a bridge between the internal supply-chain system and external verification.
 
 ---
 
@@ -410,13 +439,13 @@ Batch ID
    └── Verification
 ```
 
-This architecture provides a foundation for progressively adding more supply-chain events as the batch moves from origin to final product.
+This creates the foundation for progressively connecting supply-chain events from origin to final product.
 
 ---
 
 # 🌐 Multilingual Architecture
 
-Ayu-Setu includes language resources for multiple Indian languages.
+Ayu-Setu contains translation resources for multiple Indian languages.
 
 | Language  | Code |
 | --------- | ---- |
@@ -432,7 +461,7 @@ Ayu-Setu includes language resources for multiple Indian languages.
 | Tamil     | `ta` |
 | Telugu    | `te` |
 
-The platform also includes integration points for:
+The platform also contains integration points for:
 
 * Bhashini
 * Translation services
@@ -457,13 +486,13 @@ The platform also includes integration points for:
                  AYU-SETU APP
 ```
 
-The modular architecture makes it possible to add or replace AI providers without redesigning the entire frontend.
+The modular architecture allows AI providers to be extended or replaced independently from the main application.
 
 ---
 
 # 🗄️ Data & Backend
 
-The project contains integrations for:
+Ayu-Setu contains integrations for multiple backend and storage services.
 
 ### Firebase
 
@@ -485,7 +514,7 @@ web/src/integrations/supabase/
 app/src/lib/s3.ts
 ```
 
-The separation of backend integrations from UI components helps keep the application modular and maintainable.
+Backend integrations are separated from UI components to maintain a modular architecture.
 
 ---
 
@@ -517,7 +546,7 @@ The separation of backend integrations from UI components helps keep the applica
 * OpenRouter
 * Mock AI service
 
-### Language
+### Language Technology
 
 * Bhashini
 * Translation Service
@@ -541,7 +570,7 @@ The separation of backend integrations from UI components helps keep the applica
 ```text
 team_god-s_plan/
 │
-├── app/                         # Farmer-facing application
+├── app/                              # Farmer-facing application
 │   │
 │   ├── public/
 │   │   ├── icons/
@@ -564,7 +593,7 @@ team_god-s_plan/
 │   │
 │   └── package.json
 │
-├── web/                        # Supply-chain portal
+├── web/                              # Supply-chain portal
 │   │
 │   ├── public/
 │   │
@@ -596,7 +625,7 @@ team_god-s_plan/
 
 ## Prerequisites
 
-Make sure you have installed:
+Make sure you have:
 
 * Node.js
 * npm
@@ -638,7 +667,7 @@ npm run dev
 
 # 🔐 Environment Configuration
 
-Configure the required environment variables for the services used by the application, including:
+Configure the required environment variables for services used by the applications, including:
 
 * Firebase
 * Supabase
@@ -649,7 +678,7 @@ Configure the required environment variables for the services used by the applic
 
 Create the appropriate `.env` configuration for local development.
 
-> **Never commit API keys, private tokens, service credentials or other secrets to GitHub.**
+> **Never commit API keys, private tokens, service credentials, or other secrets to GitHub.**
 
 ---
 
@@ -721,11 +750,11 @@ npm run lint
 
 # 🔮 Future Scope
 
-Ayu-Setu is designed as a foundation that can be extended into a larger national-scale traceability ecosystem.
+Ayu-Setu is designed as a foundation that can be extended into a larger traceability ecosystem.
 
 ### 🗺️ Geo-Tagged Collection
 
-Associate collection events with geographical origin.
+Associate collection events with their geographical origin.
 
 ### 🧪 Quality Verification
 
@@ -740,13 +769,13 @@ Integrate:
 
 Future versions can explore blockchain or other immutable-ledger technologies for tamper-evident anchoring of critical supply-chain events.
 
-> Blockchain is a **future extension** of the architecture and is not represented as an already-implemented feature in the current codebase.
+> **Blockchain is a future extension and is not represented as an already-implemented feature in the current codebase.**
 
 ### 📡 Offline-First Field Collection
 
-Allow field-level users to capture data without continuous connectivity and synchronize when connectivity is restored.
+Enable field-level users to capture information without continuous internet connectivity and synchronize when connectivity is restored.
 
-### 📊 Supply Chain Analytics
+### 📊 Supply-Chain Analytics
 
 Future analytics can provide:
 
@@ -759,7 +788,7 @@ Future analytics can provide:
 
 ### 🔗 Ecosystem Integration
 
-The platform can eventually integrate with government, industry and other digital infrastructure to support interoperable traceability.
+The platform can eventually integrate with government, industry, and other digital infrastructure to support interoperable traceability.
 
 ---
 
@@ -797,7 +826,7 @@ QR-based access to verification information.
 
 # 🎯 Vision
 
-### **Origin → Identity → Traceability → Trust**
+## **Origin → Identity → Traceability → Trust**
 
 Ayu-Setu aims to create a more:
 
@@ -823,7 +852,7 @@ This project is licensed under the terms specified in the repository's [`LICENSE
 
 ## ⭐ Support the Project
 
-If you find this project useful:
+If you find Ayu-Setu useful:
 
 * ⭐ Star the repository
 * 🍴 Fork the project
