@@ -7,13 +7,13 @@ import {
   ArrowLeft,
   Leaf,
   CheckCircle2,
-  Lock,
-  Sparkles,
   Award,
   Calendar,
   Building2,
   FileCheck2,
-  Cpu
+  Cpu,
+  Fingerprint,
+  MapPin
 } from 'lucide-react';
 import ashwagandhaProduct from '@/assets/ashwagandha-product.jpg';
 
@@ -22,7 +22,7 @@ export const VerifyProductLandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full bg-[#faf9f5] text-slate-800 flex flex-col font-sans select-none relative overflow-x-hidden">
-      {/* Background Decorative Pattern */}
+      {/* Background Decorative Grid */}
       <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
       {/* ========================================================================= */}
@@ -31,7 +31,7 @@ export const VerifyProductLandingPage: React.FC = () => {
       <header className="relative z-20 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 sm:px-12 py-3.5 flex items-center justify-between">
         {/* Left: AyuTrace Nexus Logo & Digital Passport Badge */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-[#0d5c3a] text-white flex items-center justify-center shadow-sm">
               <Leaf className="w-4.5 h-4.5" />
             </div>

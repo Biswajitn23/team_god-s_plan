@@ -291,8 +291,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
               </div>
             </div>
 
-            {/* CTAs: Get Started Button, QR Verify, and Verify Product */}
-            <div className="pt-4 flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* CTAs: Get Started Button & Verify Product Button */}
+            <div className="pt-4 flex flex-wrap items-center gap-4">
               {/* Primary "Get Started >" Button */}
               <button
                 id="get-started-btn"
@@ -307,26 +307,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
                 </div>
               </button>
 
-              {/* Public Consumer Quick Verify Batch Link */}
-              <button
-                id="verify-batch-btn"
-                onClick={() => navigate('/verify')}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
-              >
-                <QrCode className="w-4 h-4 text-[#0d5c3a]" />
-                <span>Verify Herb Batch / QR</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700" />
-              </button>
-
-              {/* Verify Product Standalone App Link */}
+              {/* Single "Verify Product" Entry Point */}
               <button
                 id="verify-product-btn"
                 onClick={() => navigate('/verify-product')}
-                className="group inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-[#0d5c3a]/10 hover:bg-[#0d5c3a] text-[#0d5c3a] hover:text-white border border-[#0d5c3a]/30 hover:border-[#0d5c3a] font-bold text-sm shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
               >
-                <ShieldCheck className="w-4 h-4 text-[#0d5c3a] group-hover:text-emerald-200 transition-colors" />
+                <QrCode className="w-4 h-4 text-[#0d5c3a]" />
                 <span>Verify Product</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#0d5c3a] group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700" />
               </button>
             </div>
 
