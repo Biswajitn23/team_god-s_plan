@@ -132,6 +132,8 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/verify" element={<PublicVerifyPage />} />
             <Route path="/verify/:batchId" element={<PublicVerifyPage />} />
+            <Route path="/view" element={<PublicVerifyPage />} />
+            <Route path="/view/:batchId" element={<PublicVerifyPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

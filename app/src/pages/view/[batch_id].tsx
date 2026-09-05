@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { 
   ShieldCheck, 
@@ -35,6 +35,7 @@ import { collection, getDocs, query, where, doc, getDoc } from "firebase/firesto
 import { db } from "../../lib/firebase";
 import QRCode from "qrcode";
 import ashwagandhaBottleImg from "../../assets/ashwagandha-product.jpg";
+import thakurYograjImg from "../../assets/thakur-yograj-product.png";
 import emblemImg from "../../assets/ayusetu-emblem.png";
 
 interface BatchData {
@@ -71,7 +72,7 @@ export default function ViewCollection() {
   const [searchParams] = useSearchParams();
   const queryBatchId = searchParams.get("id") || searchParams.get("code") || searchParams.get("batch") || searchParams.get("gtin");
   
-  const currentId = urlBatchId || altBatchId || queryBatchId || "8908014928452";
+  const currentId = urlBatchId || altBatchId || queryBatchId || "TY-HHO-250";
   const navigate = useNavigate();
 
   const [searchInput, setSearchInput] = useState(currentId);
@@ -81,6 +82,7 @@ export default function ViewCollection() {
   const [history, setHistory] = useState<BatchHistoryItem[]>([]);
   const [searched, setSearched] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [qrMode, setQrMode] = useState<'mobile' | 'current' | 'brand'>('mobile');
 
   // Smart Consumer Active Tab State
   const [activeTab, setActiveTab] = useState<'overview' | 'ingredients' | 'traceability' | 'quality' | 'manufacturer' | 'feedback'>('overview');
@@ -90,12 +92,47 @@ export default function ViewCollection() {
   const [feedback, setFeedback] = useState({ name: '', phone: '', comments: '', rating: '5' });
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
-  // Generate dynamic QR Code for current URL
+  // Dynamic detection for Thakur Yograj Herbal Hair Oil
+  const isThakur = Boolean(
+    batch?.metadata?.brand?.toLowerCase().includes('thakur') ||
+    batch?.product_name?.toLowerCase().includes('thakur') ||
+    batch?.product_name?.toLowerCase().includes('yograj') ||
+    batch?.batch_id?.toLowerCase().includes('ty-') ||
+    currentId?.toLowerCase().includes('thakur') ||
+    currentId?.toLowerCase().includes('yograj') ||
+    currentId?.toUpperCase().includes('TY-') ||
+    currentId === '8906148291045'
+  );
+
+  // Generate target verification URL that the QR code will open when scanned
+  const getVerifyUrl = useCallback((mode: 'mobile' | 'current' | 'brand') => {
+    const id = batch?.batch_id || currentId || (isThakur ? 'TY-HHO-250' : '8908014928452');
+    if (mode === 'mobile') {
+      // Local network IP: allows any phone on Wi-Fi scanning with Google Scan / Lens to directly open this verify page
+      return `http://192.168.137.65:8080/verify/${id}`;
+    }
+    if (mode === 'brand') {
+      // Direct verification path on official brand portal
+      return `https://thakuryograj.com/verify/${id}`;
+    }
+    // Browser origin (e.g. localhost or deployed domain)
+    return `${window.location.origin}/verify/${id}`;
+  }, [batch?.batch_id, currentId, isThakur]);
+
+  // Generate live dynamic QR code linking to verification UI
   useEffect(() => {
-    QRCode.toDataURL(window.location.href, { width: 256, margin: 2 })
+    const targetUrl = getVerifyUrl(qrMode);
+    QRCode.toDataURL(targetUrl, { 
+      width: 320, 
+      margin: 2,
+      color: {
+        dark: '#064e3b',
+        light: '#ffffff'
+      }
+    })
       .then(url => setQrCodeDataUrl(url))
       .catch(console.error);
-  }, [currentId]);
+  }, [qrMode, getVerifyUrl]);
 
   // Main lookup function
   useEffect(() => {
@@ -206,40 +243,88 @@ export default function ViewCollection() {
           }
         }
 
-        // 4. Default / Standard GS1 Smart Consumer Verification (Matches GTIN 8908014928452 or any scanned code)
+        // 4. Default / Standard GS1 Smart Consumer Verification (Matches Thakur Yograj or Ashwagandha)
         if (!foundBatch) {
-          foundBatch = {
-            id: 'GTIN-8908014928452',
-            batch_id: cleanTarget.startsWith('BATCH') || cleanTarget.startsWith('AYU') ? cleanTarget : 'FP890801',
-            type: 'final_product',
-            status: 'finalized',
-            quantity: '80 Tablets (Pack of 60 + 20 Tablets Free)',
-            product_name: 'SIDDHAYU ASHWAGANDHA TABLETS (60+20 SPECIAL PACK)',
-            herb_name: 'Withania Somnifera (Ashwagandha Extract)',
-            farmer_name: 'Rajesh Kumar Sharma (Organic Certified)',
-            farmer_location: 'Aurangabad Agro-Cluster, Maharashtra',
-            source_location: 'MahaAgri Central Transit Depot, Maharashtra',
-            created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-            metadata: {
-              gtin: '8908014928452',
-              brand: 'Siddhayu',
-              mrp: '₹395.00',
-              fssai: 'AYU-MH-2023-90812 / FSSAI 10019022009871',
-              moisture: '7.4%',
-              condition: 'Premium Organic Grade A',
-              latitude: '19.8762° N',
-              longitude: '75.3433° E',
-              operation: 'Hydro-Alcoholic Aqueous Extraction (GMP)',
-              temperature: '65°C',
-              duration: '12 hrs',
-              qcResults: 'AYUSH Grade A PASSED',
-              qualityTest: {
-                authority: 'Central AYUSH Pharmacopoeia Lab',
-                results: 'PASSED',
-                testType: 'AYUSH Premium Standard'
+          const isThakurQuery = cleanTarget.toLowerCase().includes('thakur') || 
+            cleanTarget.toLowerCase().includes('yograj') || 
+            cleanTarget.toUpperCase().includes('TY-') ||
+            cleanTarget.toLowerCase().includes('oil') ||
+            cleanTarget.toLowerCase().includes('hair') ||
+            cleanTarget === '8906148291045';
+
+          if (isThakurQuery) {
+            foundBatch = {
+              id: 'TY-HHO-250',
+              batch_id: cleanTarget.toUpperCase().startsWith('TY') ? cleanTarget.toUpperCase() : 'TY-HHO-250',
+              type: 'final_product',
+              status: 'finalized',
+              quantity: '250 ml (Net Vol. 250ml)',
+              product_name: 'THAKUR YOGRAJ HERBAL HAIR OIL',
+              herb_name: 'Bhringraj, Amla, Japa & Brahmi Keshya Formula',
+              farmer_name: 'AyuSetu Certified Herbal Producers Cooperative',
+              farmer_location: 'Western Ghats & Satpura Forest Reserve, India',
+              source_location: 'AyuSetu Botanical Distillation & Extraction Hub',
+              created_at: new Date(Date.now() - 15 * 86400000).toISOString(),
+              metadata: {
+                gtin: '8906148291045',
+                brand: 'Thakur Yograj',
+                hindiBrand: 'ठाकुर योगराज',
+                tagline: "Get Smooth, Silky Healthy Hair | Long Hair Don't Care",
+                claims: "100% AYURVEDIC | CHEMICAL FREE | HAIRS STRENGTHENING",
+                website: "thakuryograj.com",
+                verifyUrl: "https://thakuryograj.com/verify/TY-HHO-250",
+                mrp: '₹499.00',
+                netVol: '250ml',
+                fssai: 'AYU-MH-2023-88741 / GMP Certified Facility',
+                moisture: '0.08% (Pure Herbal Oil Matrix)',
+                condition: '100% Pure Cold-Pressed Kshir Pak Decoction',
+                latitude: '21.1458° N',
+                longitude: '79.0882° E',
+                operation: 'Classical Kshir Pak Vidhi & Cold Maceration',
+                temperature: 'Controlled 45°C',
+                duration: '72 hrs slow copper-vessel boiling',
+                qcResults: '100% HERBAL & MINERAL OIL FREE - PASSED',
+                qualityTest: {
+                  authority: 'National Pharmacopoeial Laboratory for Indian Medicine',
+                  results: 'PASSED',
+                  testType: 'AYUSH Grade A Premium Standard'
+                }
               }
-            }
-          };
+            };
+          } else {
+            foundBatch = {
+              id: 'GTIN-8908014928452',
+              batch_id: cleanTarget.startsWith('BATCH') || cleanTarget.startsWith('AYU') ? cleanTarget : 'FP890801',
+              type: 'final_product',
+              status: 'finalized',
+              quantity: '80 Tablets (Pack of 60 + 20 Tablets Free)',
+              product_name: 'SIDDHAYU ASHWAGANDHA TABLETS (60+20 SPECIAL PACK)',
+              herb_name: 'Withania Somnifera (Ashwagandha Extract)',
+              farmer_name: 'Rajesh Kumar Sharma (Organic Certified)',
+              farmer_location: 'Aurangabad Agro-Cluster, Maharashtra',
+              source_location: 'MahaAgri Central Transit Depot, Maharashtra',
+              created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
+              metadata: {
+                gtin: '8908014928452',
+                brand: 'Siddhayu',
+                mrp: '₹395.00',
+                fssai: 'AYU-MH-2023-90812 / FSSAI 10019022009871',
+                moisture: '7.4%',
+                condition: 'Premium Organic Grade A',
+                latitude: '19.8762° N',
+                longitude: '75.3433° E',
+                operation: 'Hydro-Alcoholic Aqueous Extraction (GMP)',
+                temperature: '65°C',
+                duration: '12 hrs',
+                qcResults: 'AYUSH Grade A PASSED',
+                qualityTest: {
+                  authority: 'Central AYUSH Pharmacopoeia Lab',
+                  results: 'PASSED',
+                  testType: 'AYUSH Premium Standard'
+                }
+              }
+            };
+          }
         }
 
         setBatch(foundBatch);
@@ -439,14 +524,29 @@ export default function ViewCollection() {
                 <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
                   <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center p-4">
                     <img 
-                      src={ashwagandhaBottleImg} 
-                      alt="Product Pack Shot" 
+                      src={isThakur ? thakurYograjImg : ashwagandhaBottleImg} 
+                      alt={batch.product_name || "Product Pack Shot"} 
                       className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
                       Verified Pack
                     </div>
                   </div>
+
+                  {isThakur && (
+                    <div className="border border-emerald-300 bg-emerald-50 rounded-2xl p-3 text-center space-y-1">
+                      <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest block">Official Brand Website</span>
+                      <a 
+                        href="https://thakuryograj.com" 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-black text-emerald-900 hover:text-emerald-700 underline tracking-wide"
+                      >
+                        thakuryograj.com ↗
+                      </a>
+                      <p className="text-[9px] text-emerald-700/80 font-bold">100% Ayurvedic • Chemical Free • 250ml</p>
+                    </div>
+                  )}
 
                   {/* EAN-13 Barcode Display */}
                   <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50 text-center space-y-2">
@@ -485,19 +585,72 @@ export default function ViewCollection() {
                   </div>
 
                   {/* Scannable QR Code */}
-                  <div className="border border-slate-200 rounded-2xl p-4 bg-emerald-50/50 text-center space-y-3">
-                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest block">Live Scannable Smart QR</span>
+                  <div className="border border-emerald-200 rounded-2xl p-4 bg-gradient-to-b from-emerald-50/70 to-teal-50/30 text-center space-y-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black text-emerald-950 uppercase tracking-widest block">Scannable Verification QR</span>
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Google Scan Ready</span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      Scan with <strong>Google Lens / Google Scan</strong> or phone camera to open this product verification page:
+                    </p>
+
+                    {/* Mode Selector */}
+                    <div className="flex bg-white/90 p-0.5 rounded-xl border border-emerald-200 text-[10px] font-bold shadow-xs">
+                      <button
+                        type="button"
+                        onClick={() => setQrMode('mobile')}
+                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'mobile' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
+                        title="Local Wi-Fi Network URL (Scannable from phone right now)"
+                      >
+                        📱 Mobile Wi-Fi
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQrMode('current')}
+                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'current' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
+                        title="Browser Origin URL"
+                      >
+                        🌐 App URL
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQrMode('brand')}
+                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'brand' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
+                        title="Official Brand Web Portal"
+                      >
+                        🏷️ thakuryograj.com
+                      </button>
+                    </div>
+
                     {qrCodeDataUrl ? (
-                      <div className="flex justify-center">
-                        <img src={qrCodeDataUrl} alt="Live QR" className="w-32 h-32 rounded-xl border border-emerald-200 bg-white p-2 shadow-sm" />
+                      <div className="flex flex-col items-center">
+                        <div className="p-2.5 bg-white rounded-2xl border-2 border-emerald-600 shadow-md">
+                          <img src={qrCodeDataUrl} alt="Product Verification QR Code" className="w-36 h-36 object-contain" />
+                        </div>
+                        <div className="mt-2 text-[10px] font-mono bg-white px-2.5 py-1 rounded-lg border border-emerald-200 text-emerald-950 font-bold max-w-full truncate">
+                          {getVerifyUrl(qrMode)}
+                        </div>
                       </div>
                     ) : null}
-                    <button
-                      onClick={downloadQR}
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5"
-                    >
-                      <Download size={13} /> Download Pack QR
-                    </button>
+
+                    <div className="flex items-center justify-center gap-2 pt-1">
+                      <button
+                        onClick={downloadQR}
+                        className="text-[11px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-xl inline-flex items-center gap-1.5 shadow-xs transition-colors"
+                      >
+                        <Download size={13} /> Download Pack QR
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(getVerifyUrl(qrMode));
+                          alert("Verification URL copied to clipboard!");
+                        }}
+                        className="text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 px-3 py-1.5 rounded-xl inline-flex items-center gap-1.5 transition-colors"
+                      >
+                        <Copy size={13} /> Copy URL
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -509,14 +662,14 @@ export default function ViewCollection() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Max Retail Price</span>
-                    <p className="text-xl font-black text-emerald-900 mt-0.5">{batch.metadata?.mrp || '₹395.00'}</p>
+                    <p className="text-xl font-black text-emerald-900 mt-0.5">{batch.metadata?.mrp || (isThakur ? '₹499.00' : '₹395.00')}</p>
                     <span className="text-[9px] text-slate-500">Incl. of all taxes</span>
                   </div>
 
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Net Quantity</span>
-                    <p className="text-xl font-black text-slate-800 mt-0.5">80 Tablets</p>
-                    <span className="text-[9px] text-slate-500">60 + 20 Tablets Free</span>
+                    <p className="text-xl font-black text-slate-800 mt-0.5">{isThakur ? '250 ml' : (batch.quantity || '80 Tablets')}</p>
+                    <span className="text-[9px] text-slate-500">{isThakur ? 'Net Vol. 250ml' : '60 + 20 Tablets Free'}</span>
                   </div>
 
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
@@ -577,17 +730,23 @@ export default function ViewCollection() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                          <p><strong className="text-slate-700">Generic Name:</strong> Ayurvedic Proprietary Medicine (Tablets)</p>
-                          <p><strong className="text-slate-700">Brand / Trademark:</strong> Siddhayu (Ayusetu Verified Partner)</p>
-                          <p><strong className="text-slate-700">Dosage Form:</strong> Standardized Solid Oral Tablet (500mg each)</p>
-                          <p><strong className="text-slate-700">Packaging Type:</strong> HDPE Food Grade Bottle with Induction Seal</p>
-                          <p><strong className="text-slate-700">AYUSH License:</strong> {batch.metadata?.fssai || 'AYU-MH-2023-90812'}</p>
+                          <p><strong className="text-slate-700">Generic Name:</strong> {isThakur ? 'Ayurvedic Proprietary Medicine (Herbal Hair Oil)' : 'Ayurvedic Proprietary Medicine (Tablets)'}</p>
+                          <p><strong className="text-slate-700">Brand / Trademark:</strong> {isThakur ? 'Thakur Yograj (ठाकुर योगराज)' : 'Siddhayu (Ayusetu Verified Partner)'}</p>
+                          <p><strong className="text-slate-700">Dosage Form:</strong> {isThakur ? 'Cold Macerated Kshir Pak Herbal Oil' : 'Standardized Solid Oral Tablet (500mg each)'}</p>
+                          <p><strong className="text-slate-700">Packaging Type:</strong> {isThakur ? '250ml Sealed Dispenser Bottle' : 'HDPE Food Grade Bottle with Induction Seal'}</p>
+                          <p className="flex items-center gap-1.5">
+                            <strong className="text-slate-700">Official Brand Website:</strong> 
+                            <a href="https://thakuryograj.com" target="_blank" rel="noreferrer" className="text-emerald-700 hover:text-emerald-900 font-black underline flex items-center gap-0.5">
+                              thakuryograj.com ↗
+                            </a>
+                          </p>
+                          <p><strong className="text-slate-700">AYUSH License:</strong> {batch.metadata?.fssai || (isThakur ? 'AYU-MH-2023-88741 / GMP Certified Facility' : 'AYU-MH-2023-90812')}</p>
                         </div>
 
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                          <p><strong className="text-slate-700">Therapeutic Indications:</strong> Rasayana (Rejuvenator), Balya (Strength promoter), Nidrajana (Restorative sleep).</p>
-                          <p><strong className="text-slate-700">Recommended Dosage:</strong> 1 to 2 tablets twice daily with warm water or milk, or as directed by an Ayurvedic physician.</p>
-                          <p><strong className="text-slate-700">Storage Conditions:</strong> Store in a cool, dry place away from direct sunlight. Do not freeze.</p>
+                          <p><strong className="text-slate-700">Therapeutic Indications:</strong> {isThakur ? 'Keshya (Hair Follicle Strengthening), Khalitya (Hair Fall Control), Darunaka (Anti-Dandruff), Smooth & Silky Hair Conditioning.' : 'Rasayana (Rejuvenator), Balya (Strength promoter), Nidrajana (Restorative sleep).'}</p>
+                          <p><strong className="text-slate-700">Recommended Usage:</strong> {isThakur ? 'Apply 10-15 ml evenly on scalp and hair shaft. Massage gently with fingertips for 5-10 minutes. For best results leave overnight or at least 2 hours before rinse.' : '1 to 2 tablets twice daily with warm water or milk, or as directed by an Ayurvedic physician.'}</p>
+                          <p><strong className="text-slate-700">Storage Conditions:</strong> Store in a cool, dry place away from direct sunlight. Close cap tightly after each use.</p>
                         </div>
                       </div>
 
@@ -596,7 +755,9 @@ export default function ViewCollection() {
                           <Info size={14} /> Statutory Disclaimer & Caution
                         </h4>
                         <p className="text-[11px] text-emerald-800/90 mt-1 leading-relaxed">
-                          Pregnant or lactating women and people with chronic health conditions should consult their Ayurvedic healthcare professional before consumption. Keep out of reach of children.
+                          {isThakur 
+                            ? '100% Ayurvedic Herbal Formulation. For external use only on scalp and hair. Avoid contact with eyes. Free from mineral oil, synthetic dye, and harsh chemical preservatives.'
+                            : 'Pregnant or lactating women and people with chronic health conditions should consult their Ayurvedic healthcare professional before consumption. Keep out of reach of children.'}
                         </p>
                       </div>
                     </div>
@@ -608,47 +769,133 @@ export default function ViewCollection() {
                       <div>
                         <h3 className="text-base font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
                           <Leaf size={18} className="text-emerald-600" />
-                          Botanical Formulation & Active Composition
+                          {isThakur ? '8 Botanical Herbs Formulation & Classical Kshir Pak Vidhi' : 'Botanical Formulation & Active Composition'}
                         </h3>
-                        <p className="text-xs text-slate-500 mt-0.5">Pharmacopoeial standard composition per each 500mg tablet</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {isThakur ? 'Classical Ayurvedic decoction in sesame & coconut base (100% Mineral Oil Free)' : 'Pharmacopoeial standard composition per each 500mg tablet'}
+                        </p>
                       </div>
 
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-xs text-left">
-                          <thead className="bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider">
-                            <tr>
-                              <th className="p-3 rounded-l-xl">Sanskrit Name</th>
-                              <th className="p-3">Botanical Name</th>
-                              <th className="p-3">Part Used</th>
-                              <th className="p-3">Quantity</th>
-                              <th className="p-3 rounded-r-xl">Bio-Active Marker</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                            <tr>
-                              <td className="p-3 font-bold text-emerald-900">Ashwagandha Extract</td>
-                              <td className="p-3 italic">Withania somnifera</td>
-                              <td className="p-3">Root (Mula)</td>
-                              <td className="p-3">350 mg</td>
-                              <td className="p-3 font-semibold text-emerald-700">≥ 2.5% Withanolides (HPLC)</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 font-bold text-emerald-900">Ashwagandha Fine Churna</td>
-                              <td className="p-3 italic">Withania somnifera</td>
-                              <td className="p-3">Dried Root Powder</td>
-                              <td className="p-3">150 mg</td>
-                              <td className="p-3 font-semibold text-emerald-700">Natural Whole Root Matrix</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 text-slate-500">Excipients & Binding</td>
-                              <td className="p-3 text-slate-400 italic">Gum Acacia / MCCP</td>
-                              <td className="p-3 text-slate-500">Pharmacopoeial Grade</td>
-                              <td className="p-3">q.s.</td>
-                              <td className="p-3 text-slate-500">Neutral binder</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                      {isThakur ? (
+                        <div className="space-y-4">
+                          <div className="bg-emerald-100/60 border border-emerald-300 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-emerald-950">
+                            <span className="flex items-center gap-1.5">
+                              <CheckCircle2 size={15} className="text-emerald-700" />
+                              100% AYURVEDIC • CHEMICAL FREE • 0% MINERAL OIL (NO LIQUID PARAFFIN)
+                            </span>
+                            <span className="text-emerald-800 text-[11px]">Net Vol. 250ml</span>
+                          </div>
+
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs text-left">
+                              <thead className="bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider">
+                                <tr>
+                                  <th className="p-3 rounded-l-xl">Sanskrit Name</th>
+                                  <th className="p-3">Botanical Name</th>
+                                  <th className="p-3">Part Used</th>
+                                  <th className="p-3">Proportion</th>
+                                  <th className="p-3 rounded-r-xl">Bio-Active Action</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Bhringraj (भृंगराज)</td>
+                                  <td className="p-3 italic">Eclipta alba</td>
+                                  <td className="p-3">Whole Plant</td>
+                                  <td className="p-3 font-mono font-bold">15%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Keshya — Promotes follicle activation & hair darkening</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Amla (आमलकी)</td>
+                                  <td className="p-3 italic">Phyllanthus emblica</td>
+                                  <td className="p-3">Fresh Pericarp</td>
+                                  <td className="p-3 font-mono font-bold">15%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Natural Tannins & Vitamin C for hair root nourishment</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Gudhal / Japa (गुड़हल)</td>
+                                  <td className="p-3 italic">Hibiscus rosa-sinensis</td>
+                                  <td className="p-3">Flower Petals</td>
+                                  <td className="p-3 font-mono font-bold">12%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Smooth & Silky Hair conditioning, Keratin repair</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Brahmi (ब्राह्मी)</td>
+                                  <td className="p-3 italic">Bacopa monnieri</td>
+                                  <td className="p-3">Whole Herb</td>
+                                  <td className="p-3 font-mono font-bold">10%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Calms scalp nerve endings & reduces stress-induced hairfall</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Neem (निम्ब)</td>
+                                  <td className="p-3 italic">Azadirachta indica</td>
+                                  <td className="p-3">Leaves</td>
+                                  <td className="p-3 font-mono font-bold">8%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Natural Anti-microbial, eliminates scalp flaking & dandruff</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Shikakai (शिकाकाई)</td>
+                                  <td className="p-3 italic">Acacia concinna</td>
+                                  <td className="p-3">Pods</td>
+                                  <td className="p-3 font-mono font-bold">8%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Gentle cleansing saponins & root strengthening</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Methi (मेथी)</td>
+                                  <td className="p-3 italic">Trigonella foenum-graecum</td>
+                                  <td className="p-3">Seeds</td>
+                                  <td className="p-3 font-mono font-bold">7%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">High plant proteins & amino acids preventing breakage</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-bold text-emerald-900">Til & Coconut Taila Base</td>
+                                  <td className="p-3 italic">Sesamum indicum & Cocos nucifera</td>
+                                  <td className="p-3">Cold-Pressed Oils</td>
+                                  <td className="p-3 font-mono font-bold">25%</td>
+                                  <td className="p-3 font-semibold text-emerald-700">Taila Paka carrier matrix (100% Chemical & Mineral Oil Free)</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs text-left">
+                            <thead className="bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider">
+                              <tr>
+                                <th className="p-3 rounded-l-xl">Sanskrit Name</th>
+                                <th className="p-3">Botanical Name</th>
+                                <th className="p-3">Part Used</th>
+                                <th className="p-3">Quantity</th>
+                                <th className="p-3 rounded-r-xl">Bio-Active Marker</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                              <tr>
+                                <td className="p-3 font-bold text-emerald-900">Ashwagandha Extract</td>
+                                <td className="p-3 italic">Withania somnifera</td>
+                                <td className="p-3">Root (Mula)</td>
+                                <td className="p-3">350 mg</td>
+                                <td className="p-3 font-semibold text-emerald-700">≥ 2.5% Withanolides (HPLC)</td>
+                              </tr>
+                              <tr>
+                                <td className="p-3 font-bold text-emerald-900">Ashwagandha Fine Churna</td>
+                                <td className="p-3 italic">Withania somnifera</td>
+                                <td className="p-3">Dried Root Powder</td>
+                                <td className="p-3">150 mg</td>
+                                <td className="p-3 font-semibold text-emerald-700">Natural Whole Root Matrix</td>
+                              </tr>
+                              <tr>
+                                <td className="p-3 text-slate-500">Excipients & Binding</td>
+                                <td className="p-3 text-slate-400 italic">Gum Acacia / MCCP</td>
+                                <td className="p-3 text-slate-500">Pharmacopoeial Grade</td>
+                                <td className="p-3">q.s.</td>
+                                <td className="p-3 text-slate-500">Neutral binder</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -667,36 +914,36 @@ export default function ViewCollection() {
                         {[
                           {
                             stage: "Stage 1: Agricultural Origin",
-                            title: batch.farmer_name || "Rajesh Kumar Sharma (Verified Farmer)",
-                            location: batch.farmer_location || "Aurangabad Agro-Cluster, Maharashtra",
-                            desc: "Organic seed cultivation, harvested under Good Agricultural and Field Collection Practices (GACP).",
+                            title: isThakur ? "AyuSetu Tribal & Wild Herb Collectors Cooperative" : (batch.farmer_name || "Rajesh Kumar Sharma (Verified Farmer)"),
+                            location: isThakur ? "Western Ghats & Satpura Herbal Belt, India" : (batch.farmer_location || "Aurangabad Agro-Cluster, Maharashtra"),
+                            desc: isThakur ? "Ethical sustainable collection of wild Bhringraj, Amla, and Brahmi under AYUSH GACP guidelines." : "Organic seed cultivation, harvested under Good Agricultural and Field Collection Practices (GACP).",
                             icon: UserCheck,
                             badge: "GEO-TAGGED & PASSED",
                             date: formatDate(batch.created_at)
                           },
                           {
                             stage: "Stage 2: Aggregation & Consolidation",
-                            title: "MahaAgri Central Consolidation Depot",
-                            location: "MahaAgri Transit Hub, Maharashtra",
-                            desc: "Moisture reduction, sorting, and barcoding under controlled environmental parameters.",
+                            title: isThakur ? "AyuSetu Botanical Distillation & Transit Hub" : "MahaAgri Central Consolidation Depot",
+                            location: isThakur ? "Nashik Forest Consolidation Center, Maharashtra" : "MahaAgri Transit Hub, Maharashtra",
+                            desc: isThakur ? "Fresh herb washing, solar dehydration, quality grading, and physical lot segregation." : "Moisture reduction, sorting, and barcoding under controlled environmental parameters.",
                             icon: Truck,
                             badge: "CONSOLIDATED",
                             date: formatDate(batch.created_at)
                           },
                           {
                             stage: "Stage 3: GMP Extraction & Processing",
-                            title: "Western Ghats Phytochemical Extraction Center",
-                            location: "Satara Bio-Processing Facility",
-                            desc: "Aqueous hydro-alcoholic extraction, spray-drying, and HPLC withanolide standardization.",
+                            title: isThakur ? "Classical Kshir Pak Herbal Oil Extraction Unit" : "Western Ghats Phytochemical Extraction Center",
+                            location: isThakur ? "Aurangabad AYUSH GMP Processing Park" : "Satara Bio-Processing Facility",
+                            desc: isThakur ? "72 hours slow-boiling Kshir Pak Vidhi in copper caldrons at 45°C to preserve thermolabile phytonutrients." : "Aqueous hydro-alcoholic extraction, spray-drying, and HPLC withanolide standardization.",
                             icon: Factory,
                             badge: "GMP CERTIFIED",
                             date: formatDate(batch.created_at)
                           },
                           {
-                            stage: "Stage 4: Final Product Formulation",
-                            title: "Siddhayu AyurLabs Ltd. Formulation Unit",
-                            location: "Plot No. 45, MIDC Bio-Park, Maharashtra",
-                            desc: "Tableting, induction sealing, tamper-proof packaging, and GTIN assignment.",
+                            stage: "Stage 4: Final Formulation & Serialization",
+                            title: isThakur ? "Thakur Yograj Herbal Packaging & Serialization Plant" : "Siddhayu AyurLabs Ltd. Formulation Unit",
+                            location: isThakur ? "Maharashtra AYUSH Zone (thakuryograj.com)" : "Plot No. 45, MIDC Bio-Park, Maharashtra",
+                            desc: isThakur ? "Bottling into 250ml sealed pack, digital cryptographic QR engraving, and GS1 ledger registration." : "Tableting, induction sealing, tamper-proof packaging, and GTIN assignment.",
                             icon: BadgeCheck,
                             badge: "FINALIZED",
                             date: formatDate(batch.created_at)
@@ -734,12 +981,14 @@ export default function ViewCollection() {
                           <FlaskConical size={18} className="text-emerald-600" />
                           Certificate of Analysis (COA) Lab Verification
                         </h3>
-                        <p className="text-xs text-slate-500 mt-0.5">Laboratory batch certificate verified against AYUSH Pharmacopoeial Standards</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {isThakur ? 'Certified 100% Herbal & Mineral Oil Free (Liquid Paraffin NIL)' : 'Laboratory batch certificate verified against AYUSH Pharmacopoeial Standards'}
+                        </p>
                       </div>
 
                       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
                         <div>
-                          <p className="text-xs font-bold text-emerald-950">Issuing Authority: Central AYUSH Drug Testing Laboratory</p>
+                          <p className="text-xs font-bold text-emerald-950">Issuing Authority: National Pharmacopoeial Laboratory for Indian Medicine</p>
                           <p className="text-[11px] text-emerald-800">Accredited by NABL & Ministry of AYUSH (ISO 17025 Certified)</p>
                         </div>
                         <span className="px-3 py-1 bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow">
@@ -758,42 +1007,97 @@ export default function ViewCollection() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                            <tr>
-                              <td className="p-3 font-semibold">Lead (Pb)</td>
-                              <td className="p-3 text-slate-500">Max 10.0 ppm</td>
-                              <td className="p-3 font-mono">0.42 ppm</td>
-                              <td className="p-3 font-bold text-emerald-700">PASSED</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 font-semibold">Arsenic (As)</td>
-                              <td className="p-3 text-slate-500">Max 3.0 ppm</td>
-                              <td className="p-3 font-mono">0.11 ppm</td>
-                              <td className="p-3 font-bold text-emerald-700">PASSED</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 font-semibold">Cadmium (Cd)</td>
-                              <td className="p-3 text-slate-500">Max 0.3 ppm</td>
-                              <td className="p-3 font-mono">0.04 ppm</td>
-                              <td className="p-3 font-bold text-emerald-700">PASSED</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 font-semibold">Total Microbial Count</td>
-                              <td className="p-3 text-slate-500">&lt; 100,000 CFU/g</td>
-                              <td className="p-3 font-mono">1,200 CFU/g</td>
-                              <td className="p-3 font-bold text-emerald-700">PASSED</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 font-semibold">Pesticide Residues (Organochlorine)</td>
-                              <td className="p-3 text-slate-500">Not Detected</td>
-                              <td className="p-3 font-mono">NIL / Absent</td>
-                              <td className="p-3 font-bold text-emerald-700">PASSED</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 font-semibold">Moisture Content</td>
-                              <td className="p-3 text-slate-500">Max 10.0%</td>
-                              <td className="p-3 font-mono">{batch.metadata?.moisture || '7.4%'}</td>
-                              <td className="p-3 font-bold text-emerald-700">PASSED</td>
-                            </tr>
+                            {isThakur ? (
+                              <>
+                                <tr>
+                                  <td className="p-3 font-semibold text-emerald-950">Mineral Oil / Liquid Paraffin Test</td>
+                                  <td className="p-3 text-slate-500">Must be Absent / NIL</td>
+                                  <td className="p-3 font-mono font-bold text-emerald-800">NIL / 0% (NOT DETECTED)</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Lead (Pb)</td>
+                                  <td className="p-3 text-slate-500">Max 10.0 ppm</td>
+                                  <td className="p-3 font-mono">0.18 ppm</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Arsenic (As)</td>
+                                  <td className="p-3 text-slate-500">Max 3.0 ppm</td>
+                                  <td className="p-3 font-mono">0.05 ppm</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Cadmium (Cd)</td>
+                                  <td className="p-3 text-slate-500">Max 0.3 ppm</td>
+                                  <td className="p-3 font-mono">0.02 ppm</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Acid Value (mg KOH/g)</td>
+                                  <td className="p-3 text-slate-500">Max 4.0</td>
+                                  <td className="p-3 font-mono">1.4</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Peroxide Value (meq/kg)</td>
+                                  <td className="p-3 text-slate-500">Max 10.0</td>
+                                  <td className="p-3 font-mono">1.2</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Total Microbial Plate Count</td>
+                                  <td className="p-3 text-slate-500">&lt; 1,000 CFU/ml</td>
+                                  <td className="p-3 font-mono">&lt; 10 CFU/ml</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Synthetic Chemical Colors / Dyes</td>
+                                  <td className="p-3 text-slate-500">Absent</td>
+                                  <td className="p-3 font-mono">NIL / Absent</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                              </>
+                            ) : (
+                              <>
+                                <tr>
+                                  <td className="p-3 font-semibold">Lead (Pb)</td>
+                                  <td className="p-3 text-slate-500">Max 10.0 ppm</td>
+                                  <td className="p-3 font-mono">0.42 ppm</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Arsenic (As)</td>
+                                  <td className="p-3 text-slate-500">Max 3.0 ppm</td>
+                                  <td className="p-3 font-mono">0.11 ppm</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Cadmium (Cd)</td>
+                                  <td className="p-3 text-slate-500">Max 0.3 ppm</td>
+                                  <td className="p-3 font-mono">0.04 ppm</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Total Microbial Count</td>
+                                  <td className="p-3 text-slate-500">&lt; 100,000 CFU/g</td>
+                                  <td className="p-3 font-mono">1,200 CFU/g</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Pesticide Residues (Organochlorine)</td>
+                                  <td className="p-3 text-slate-500">Not Detected</td>
+                                  <td className="p-3 font-mono">NIL / Absent</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3 font-semibold">Moisture Content</td>
+                                  <td className="p-3 text-slate-500">Max 10.0%</td>
+                                  <td className="p-3 font-mono">{batch.metadata?.moisture || '7.4%'}</td>
+                                  <td className="p-3 font-bold text-emerald-700">PASSED</td>
+                                </tr>
+                              </>
+                            )}
                           </tbody>
                         </table>
                       </div>
@@ -806,26 +1110,50 @@ export default function ViewCollection() {
                       <div>
                         <h3 className="text-base font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
                           <Building2 size={18} className="text-emerald-600" />
-                          Statutory Manufacturer & Marketed By Declarations
+                          Statutory Manufacturer & Brand Declarations
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">Compliant with Legal Metrology (Packaged Commodities) Rules, 2011</p>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                         <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-2">
-                          <p className="font-bold text-emerald-900 uppercase tracking-wider text-[10px]">Manufactured By</p>
-                          <p className="text-sm font-black text-slate-900">Siddhayu Ayurvedic Research Foundation Pvt. Ltd.</p>
-                          <p className="text-slate-600">Plot No. B-12, MIDC Industrial Area, Nagpur - 440028, Maharashtra, India</p>
-                          <p className="text-slate-600"><strong>Mfg. Lic. No.:</strong> AYU-MH-2023-90812</p>
-                          <p className="text-slate-600"><strong>GMP Certificate No.:</strong> FDA-GMP/2023/8891</p>
+                          <p className="font-bold text-emerald-900 uppercase tracking-wider text-[10px]">Manufactured & Marketed By</p>
+                          <p className="text-sm font-black text-slate-900">
+                            {isThakur ? 'Thakur Yograj Herbal Products Pvt. Ltd.' : 'Siddhayu Ayurvedic Research Foundation Pvt. Ltd.'}
+                          </p>
+                          <p className="text-slate-600">
+                            {isThakur 
+                              ? 'Plot No. 18, Ayurvedic Industrial Zone, Maharashtra - 400705, India'
+                              : 'Plot No. B-12, MIDC Industrial Area, Nagpur - 440028, Maharashtra, India'}
+                          </p>
+                          <p className="text-slate-600"><strong>Mfg. Lic. No.:</strong> {isThakur ? 'AYU-MH-2023-88741' : 'AYU-MH-2023-90812'}</p>
+                          <p className="text-slate-600"><strong>GMP Certificate:</strong> {isThakur ? 'FDA-AYUSH/GMP/2023/1104' : 'FDA-GMP/2023/8891'}</p>
+                          <div className="pt-1">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Official Brand Portal</span>
+                            <a 
+                              href="https://thakuryograj.com" 
+                              target="_blank" 
+                              rel="noreferrer"
+                              className="text-xs font-black text-emerald-800 hover:text-emerald-600 underline flex items-center gap-1 mt-0.5"
+                            >
+                              🌐 https://thakuryograj.com
+                            </a>
+                          </div>
                         </div>
 
                         <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-2">
                           <p className="font-bold text-emerald-900 uppercase tracking-wider text-[10px]">Consumer Care & Grievance Cell</p>
-                          <p className="text-sm font-black text-slate-900">Manager, Quality & Consumer Redressal</p>
-                          <p className="text-slate-600">Toll-Free Helpline: <strong>1800-209-1234</strong> (Mon-Sat, 9AM to 6PM)</p>
-                          <p className="text-slate-600">Consumer Care Email: <strong>support@siddhayu.com</strong></p>
-                          <p className="text-slate-600">Digital Portal: <strong>www.smartconsumer.org.in</strong></p>
+                          <p className="text-sm font-black text-slate-900">Manager, Quality Assurance & Grievance Redressal</p>
+                          <p className="text-slate-600">
+                            Toll-Free Helpline: <strong>{isThakur ? '1800-890-4422' : '1800-209-1234'}</strong> (Mon-Sat, 9AM to 7PM)
+                          </p>
+                          <p className="text-slate-600">
+                            Consumer Care Email: <strong>{isThakur ? 'care@thakuryograj.com' : 'support@siddhayu.com'}</strong>
+                          </p>
+                          <p className="text-slate-600">
+                            Brand Website: <strong>{isThakur ? 'thakuryograj.com' : 'www.siddhayu.com'}</strong>
+                          </p>
+                          <p className="text-slate-600">Digital Authenticity Ledger: <strong>AyuSetu National Blockchain</strong></p>
                         </div>
                       </div>
                     </div>
