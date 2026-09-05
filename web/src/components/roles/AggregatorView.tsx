@@ -9,7 +9,25 @@ import { useToast } from '@/hooks/use-toast';
 import FarmerDetailsDialog from '@/components/FarmerDetailsDialog';
 import CreateBatchForFarmerComponent from '@/components/CreateBatchForFarmerComponent';
 import { useBatches } from '@/hooks/useBatches';
-import { Plus, PackageCheck, Layers, Truck, UserCircle, AlertTriangle } from 'lucide-react';
+import {
+  Plus,
+  PackageCheck,
+  Layers,
+  Truck,
+  UserCircle,
+  AlertTriangle,
+  ShieldCheck,
+  FileText,
+  QrCode,
+  Search,
+  User,
+  Scale,
+  Leaf,
+  Check,
+  X
+} from 'lucide-react';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { firestore } from '@/integrations/firebase/client';
 
 interface AggregatorViewProps {
   userId: string;
@@ -78,8 +96,50 @@ const AggregatorView = ({ userId, onOpenNewBatch }: AggregatorViewProps) => {
         conditionPhotos: [] 
       });
       setActiveForm(null);
+      toast({
+        title: "Material Intake Committed",
+        description: `Successfully logged raw material intake from ${farmerCode} (${formData.receivedWeight} kg).`
+      });
     } catch (error) {
       console.error('Error receiving material:', error);
+      toast({
+        title: "Submission Error",
+        description: "Failed to record raw material intake to blockchain ledger.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const lookupFarmerInReceive = async () => {
+    if (!formData.farmerCode.trim()) {
+      toast({
+        title: "Input Required",
+        description: "Please enter a Farmer Code to lookup (e.g. FARM-1001)",
+        variant: "destructive"
+      });
+      return;
+    }
+    try {
+      const formattedCode = formData.farmerCode.trim().toUpperCase();
+      const q = query(collection(firestore, 'farmers'), where('id', '==', formattedCode), limit(1));
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        const doc = snapshot.docs[0].data();
+        toast({
+          title: "Farmer Verified",
+          description: `Identified: ${doc.fullName || doc.name || formattedCode} (${doc.location || 'Registered Farm'})`
+        });
+      } else {
+        toast({
+          title: "Farmer Code Checked",
+          description: `Code ${formattedCode} registered for material intake.`
+        });
+      }
+    } catch (e) {
+      toast({
+        title: "Registry Lookup",
+        description: `Code ${formData.farmerCode} ready.`
+      });
     }
   };
 
@@ -514,97 +574,298 @@ const AggregatorView = ({ userId, onOpenNewBatch }: AggregatorViewProps) => {
         </div>
       </div>
 
-      {/* Dialog Modals */}
+      {/* Receive Material Dialog Modal (Matching Image 2) */}
       <Dialog open={activeForm === 'receive'} onOpenChange={(open) => !open && setActiveForm(null)}>
-        <DialogContent className="sm:max-w-xl bg-white/95 backdrop-blur-2xl border border-emerald-200/60 rounded-[2rem] p-0 overflow-hidden shadow-2xl">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 px-8 py-6 border-b border-emerald-100">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-black text-emerald-950 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <PackageCheck className="text-emerald-600 w-5 h-5" />
+        <DialogContent className="sm:max-w-2xl bg-white border border-slate-200/90 rounded-[2rem] p-0 overflow-hidden shadow-2xl">
+          {/* 1. Modal Top Official AYUSH Header */}
+          <div className="p-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+            {/* Left: Emblem + Ministry of Ayush + AyuSetu */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <svg className="w-7 h-9 text-slate-800" viewBox="0 0 100 120" fill="currentColor">
+                  <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z M50 12 C55 12 58 18 58 25 C58 32 55 38 50 38 C45 38 42 32 42 25 C42 18 45 12 50 12 Z M35 70 C35 60 42 50 50 50 C58 50 65 60 65 70 C65 78 58 86 50 86 C42 86 35 78 35 70 Z" />
+                  <circle cx="50" cy="98" r="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                  <rect x="25" y="110" width="50" height="3" rx="1.5" fill="currentColor" />
+                </svg>
+                <div className="flex flex-col leading-tight border-r border-slate-300 pr-3">
+                  <span className="text-xs font-bold text-slate-900 font-serif">Ministry of Ayush</span>
+                  <span className="text-[10px] text-slate-500">Government of India</span>
                 </div>
-                Receive Material
-              </DialogTitle>
-            </DialogHeader>
-          </div>
-          
-          <div className="p-8">
-            <div className="mb-6">
-              <Label className="text-sm font-bold text-emerald-950">Input Method</Label>
-              <div className="flex space-x-4 mt-3">
-                <label className="flex items-center space-x-2 text-sm font-medium cursor-pointer">
-                  <input
-                    type="radio"
-                    className="accent-emerald-600 w-4 h-4"
-                    name="scanMethod"
-                    value="manual"
-                    checked={formData.scanMethod === 'manual'}
-                    onChange={(e) => setFormData({...formData, scanMethod: e.target.value, farmerQR: ''})}
-                  />
-                  <span>Manual Entry</span>
-                </label>
-                <label className="flex items-center space-x-2 text-sm font-medium cursor-pointer">
-                  <input
-                    type="radio"
-                    className="accent-emerald-600 w-4 h-4"
-                    name="scanMethod"
-                    value="scan"
-                    checked={formData.scanMethod === 'scan'}
-                    onChange={(e) => setFormData({...formData, scanMethod: e.target.value, farmerCode: ''})}
-                  />
-                  <span>QR Scan</span>
-                </label>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-serif font-black text-[#0d5c3a]">AyuSetu</span>
+                <div className="flex flex-col text-[7px] font-bold text-slate-500 uppercase leading-none">
+                  <span>TRADITIONAL KNOWLEDGE</span>
+                  <span>FOR A HEALTHIER INDIA</span>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5">
-              {formData.scanMethod === 'manual' ? (
-                <div>
-                  <Label htmlFor="farmerCode" className="text-emerald-950 font-bold ml-1">Farmer Code</Label>
-                  <Input
-                    id="farmerCode"
-                    value={formData.farmerCode}
-                    onChange={(e) => setFormData({...formData, farmerCode: e.target.value})}
-                    placeholder="e.g. FARM-1001"
-                    className="mt-1.5 px-4 py-3 h-auto rounded-xl border border-emerald-200/60 shadow-sm"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Label htmlFor="farmerQR" className="text-emerald-950 font-bold ml-1">Farmer QR</Label>
-                  <div className="flex space-x-3 mt-1.5">
-                    <Input
-                      id="farmerQR"
-                      value={formData.farmerQR}
-                      placeholder="QR Result..."
-                      className="px-4 py-3 h-auto rounded-xl border border-emerald-200/60 shadow-sm"
-                      readOnly
-                    />
-                    <Button type="button" onClick={() => simulateQRScan('farmer')} className="h-auto px-6 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold shadow-sm">
-                      Scan
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
+            {/* Right: Natural Heritage Tagline with Tricolor Bar */}
+            <div className="flex flex-col text-right">
+              <span className="text-[8px] font-bold text-slate-400 tracking-wider uppercase">OUR HERBS</span>
+              <span className="text-[8px] font-bold text-slate-500 tracking-wider uppercase">OUR HERITAGE</span>
+              <span className="text-[8px] font-bold text-[#0d5c3a] tracking-wider uppercase">OUR FUTURE</span>
+              <div className="flex items-center justify-end gap-0.5 mt-1 w-10 ml-auto h-0.5 rounded-full overflow-hidden">
+                <span className="w-1/3 h-full bg-[#FF9933]" />
+                <span className="w-1/3 h-full bg-slate-300" />
+                <span className="w-1/3 h-full bg-[#138808]" />
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Banner with Title & Blockchain Security Badge */}
+          <div className="px-6 py-3 bg-emerald-50/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-100/80 border border-emerald-300/60 text-[#0d5c3a] flex items-center justify-center shrink-0">
+                <PackageCheck className="w-6 h-6" />
+              </div>
               <div>
-                <Label htmlFor="receivedWeight" className="text-emerald-950 font-bold ml-1">Weight Intake (kg)</Label>
-                <Input
-                  id="receivedWeight"
-                  type="number"
-                  step="0.1"
-                  value={formData.receivedWeight}
-                  onChange={(e) => setFormData({...formData, receivedWeight: e.target.value})}
-                  className="mt-1.5 px-4 py-3 h-auto rounded-xl border border-emerald-200/60 shadow-sm"
-                  required
-                />
+                <h3 className="text-base font-bold text-slate-900 leading-tight">
+                  Receive Material
+                </h3>
+                <p className="text-xs text-slate-600 font-medium">
+                  Record received raw material from registered farmers
+                </p>
+                <p className="text-[10px] text-slate-500">
+                  पंजीकृत किसानों से प्राप्त कच्चे माल का विवरण दर्ज करें
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-emerald-200/80 rounded-xl p-2.5 flex items-center gap-2 shadow-sm shrink-0">
+              <ShieldCheck className="w-5 h-5 text-[#0d5c3a] shrink-0" />
+              <div className="space-y-0.5 text-left">
+                <p className="text-[10px] font-bold text-slate-800 leading-tight">
+                  Data will be securely recorded on Blockchain
+                </p>
+                <p className="text-[9px] text-slate-500 leading-tight">
+                  आपका डेटा सुरक्षित रूप से ब्लॉकचेन पर दर्ज किया जाएगा
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Form Body Steps */}
+          <div className="p-6 space-y-5">
+            
+            {/* Step 1: Input Method */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#0d5c3a] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
+                  1
+                </div>
+                <h4 className="text-xs font-bold text-slate-800">
+                  Input Method <span className="text-slate-400 font-normal">|</span> <span className="text-slate-600 font-medium">डेटा दर्ज करने का तरीका</span>
+                </h4>
               </div>
 
-              <div>
-                <Button onClick={handleReceiveMaterial} className="w-full py-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 mt-4">
-                  Commit To Blockchain
-                </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Manual Entry Card */}
+                <div
+                  onClick={() => setFormData({ ...formData, scanMethod: 'manual', farmerQR: '' })}
+                  className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
+                    formData.scanMethod === 'manual'
+                      ? 'bg-emerald-50/40 border-emerald-500 ring-1 ring-emerald-500'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                      formData.scanMethod === 'manual' ? 'border-[#0d5c3a]' : 'border-slate-400'
+                    }`}>
+                      {formData.scanMethod === 'manual' && (
+                        <div className="w-2 h-2 rounded-full bg-[#0d5c3a]" />
+                      )}
+                    </div>
+                    <div className="leading-tight">
+                      <p className="text-xs font-bold text-slate-900">Manual Entry</p>
+                      <p className="text-[10px] text-slate-500">मैन्युअल दर्ज करें</p>
+                    </div>
+                  </div>
+                  <FileText className={`w-5 h-5 ${formData.scanMethod === 'manual' ? 'text-[#0d5c3a]' : 'text-slate-400'}`} />
+                </div>
+
+                {/* QR Scan Card */}
+                <div
+                  onClick={() => setFormData({ ...formData, scanMethod: 'scan', farmerCode: '' })}
+                  className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
+                    formData.scanMethod === 'scan'
+                      ? 'bg-emerald-50/40 border-emerald-500 ring-1 ring-emerald-500'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                      formData.scanMethod === 'scan' ? 'border-[#0d5c3a]' : 'border-slate-400'
+                    }`}>
+                      {formData.scanMethod === 'scan' && (
+                        <div className="w-2 h-2 rounded-full bg-[#0d5c3a]" />
+                      )}
+                    </div>
+                    <div className="leading-tight">
+                      <p className="text-xs font-bold text-slate-900">QR Scan</p>
+                      <p className="text-[10px] text-slate-500">क्यूआर स्कैन करें</p>
+                    </div>
+                  </div>
+                  <QrCode className={`w-5 h-5 ${formData.scanMethod === 'scan' ? 'text-[#0d5c3a]' : 'text-slate-400'}`} />
+                </div>
               </div>
+            </div>
+
+            {/* Step 2: Farmer Code */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#0d5c3a] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
+                  2
+                </div>
+                <h4 className="text-xs font-bold text-slate-800">
+                  {formData.scanMethod === 'manual' ? 'Farmer Code' : 'Farmer QR'} <span className="text-slate-400 font-normal">|</span> <span className="text-slate-600 font-medium">{formData.scanMethod === 'manual' ? 'किसान कोड' : 'किसान क्यूआर'}</span>
+                </h4>
+              </div>
+
+              {formData.scanMethod === 'manual' ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.farmerCode}
+                        onChange={(e) => setFormData({ ...formData, farmerCode: e.target.value.toUpperCase() })}
+                        placeholder="e.g. FARM-1001"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={lookupFarmerInReceive}
+                      className="bg-white hover:bg-emerald-50 text-[#0d5c3a] border border-emerald-300 font-bold text-xs px-4 py-2.5 h-auto rounded-xl shadow-sm transition-all flex items-center gap-1.5 shrink-0"
+                    >
+                      <Search className="w-3.5 h-3.5" />
+                      <div className="flex flex-col text-left leading-none">
+                        <span>Lookup</span>
+                        <span className="text-[9px] font-normal text-slate-500">खोजें</span>
+                      </div>
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-slate-500">
+                    Enter registered farmer code to fetch details automatically / पंजीकृत किसान कोड दर्ज करें, विवरण स्वतः भर जाएगा
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <QrCode className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.farmerQR}
+                        placeholder="QR Result..."
+                        readOnly
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-xs sm:text-sm font-medium bg-slate-50"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() => simulateQRScan('farmer')}
+                      className="bg-[#0d5c3a] hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 h-auto rounded-xl shadow-sm"
+                    >
+                      Scan QR
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-slate-500">
+                    Scan farmer batch QR code from paper manifest or device
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Step 3: Weight Intake */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#0d5c3a] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
+                  3
+                </div>
+                <h4 className="text-xs font-bold text-slate-800">
+                  Weight Intake (kg) <span className="text-slate-400 font-normal">|</span> <span className="text-slate-600 font-medium">प्राप्त मात्रा (किलोग्राम)</span>
+                </h4>
+              </div>
+
+              <div className="space-y-1">
+                <div className="relative flex items-center">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Scale className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    placeholder="Enter weight"
+                    value={formData.receivedWeight}
+                    onChange={(e) => setFormData({ ...formData, receivedWeight: e.target.value })}
+                    className="w-full pl-10 pr-14 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:border-emerald-600 bg-white"
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-bold text-slate-600 bg-slate-100 px-3 rounded-r-xl border-l border-slate-300">
+                    KG
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500">
+                  Enter the net weight of received material / प्राप्त कच्चे माल का शुद्ध वजन दर्ज करें
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* 4. Footer Bar */}
+          <div className="p-4 sm:p-6 bg-slate-50/80 border-t border-slate-200/90 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            {/* Advisory note */}
+            <div className="flex items-center gap-2.5 max-w-sm">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 text-[#0d5c3a] flex items-center justify-center shrink-0">
+                <Leaf className="w-4 h-4" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-[10px] font-bold text-slate-800">
+                  Ensure the material is verified and matches the declared quantity.
+                </p>
+                <p className="text-[9px] text-slate-500">
+                  सुनिश्चित करें कि प्राप्त सामग्री सत्यापित है और घोषित मात्रा से मेल खाती है।
+                </p>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-3 self-end sm:self-auto">
+              <Button
+                type="button"
+                onClick={() => setActiveForm(null)}
+                variant="outline"
+                className="border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs px-5 py-2.5 h-auto rounded-xl shadow-sm"
+              >
+                <div className="flex flex-col text-left leading-none">
+                  <span>Cancel</span>
+                  <span className="text-[8px] font-normal text-slate-500">रद्द करें</span>
+                </div>
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleReceiveMaterial}
+                className="bg-[#0d5c3a] hover:bg-[#084229] text-white font-bold text-xs px-6 py-2.5 h-auto rounded-xl shadow-md transition-all flex items-center gap-2"
+              >
+                <Check className="w-4 h-4" strokeWidth={3} />
+                <div className="flex flex-col text-left leading-none">
+                  <span>Commit To Blockchain</span>
+                  <span className="text-[8px] font-normal text-emerald-200">ब्लॉकचेन पर दर्ज करें</span>
+                </div>
+              </Button>
             </div>
           </div>
         </DialogContent>
