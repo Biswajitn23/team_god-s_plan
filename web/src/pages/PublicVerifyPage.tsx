@@ -667,34 +667,6 @@ const PublicVerifyPage = () => {
                       Scan with <strong>Google Scan / Google Lens</strong> or phone camera to verify this product:
                     </p>
 
-                    {/* Mode Selector */}
-                    <div className="flex bg-slate-100 p-0.5 rounded-xl text-[10px] font-bold">
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('google')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'google' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Google Scan Official Verification URL"
-                      >
-                        🔍 Google Scan
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('mobile')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'mobile' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Local Wi-Fi Network URL"
-                      >
-                        📱 Local Wi-Fi
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('current')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'current' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Localhost Domain"
-                      >
-                        🌐 Localhost
-                      </button>
-                    </div>
-
                     <div className="flex flex-col items-center pt-1">
                       <div id="public-product-qr" className="p-2.5 bg-white border-2 border-emerald-600 rounded-2xl shadow-sm">
                         <QRCode value={qrUrl} size={140} />

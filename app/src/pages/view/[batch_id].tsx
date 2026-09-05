@@ -626,34 +626,6 @@ export default function ViewCollection() {
                       Scan with <strong>Google Scan / Google Lens</strong> or phone camera to verify this product:
                     </p>
 
-                    {/* Mode Selector */}
-                    <div className="flex bg-white/90 p-0.5 rounded-xl border border-emerald-200 text-[10px] font-bold shadow-xs">
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('google')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'google' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Google Scan Official Verification URL"
-                      >
-                        🔍 Google Scan
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('mobile')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'mobile' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Local Wi-Fi Network URL (Scannable on local network)"
-                      >
-                        📱 Local Wi-Fi
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQrMode('current')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${qrMode === 'current' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-emerald-900'}`}
-                        title="Localhost Domain"
-                      >
-                        🌐 Localhost
-                      </button>
-                    </div>
-
                     {qrCodeDataUrl ? (
                       <div className="flex flex-col items-center">
                         <div className="p-2.5 bg-white rounded-2xl border-2 border-emerald-600 shadow-md">
