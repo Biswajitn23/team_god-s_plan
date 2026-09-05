@@ -13,9 +13,10 @@ import { Plus, PackageCheck, Layers, Truck, UserCircle, AlertTriangle } from 'lu
 
 interface AggregatorViewProps {
   userId: string;
+  onOpenNewBatch?: () => void;
 }
 
-const AggregatorView = ({ userId }: AggregatorViewProps) => {
+const AggregatorView = ({ userId, onOpenNewBatch }: AggregatorViewProps) => {
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const { batches, loading, createBatch, updateBatch } = useBatches('aggregator', userId);
 
@@ -205,6 +206,16 @@ const AggregatorView = ({ userId }: AggregatorViewProps) => {
     }
   };
 
+  if (activeForm === 'createBatchForFarmer') {
+    return (
+      <CreateBatchForFarmerComponent
+        collectorName="Senior Field Aggregator"
+        collectorId={userId}
+        onClose={() => setActiveForm(null)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       
@@ -267,7 +278,13 @@ const AggregatorView = ({ userId }: AggregatorViewProps) => {
         
         {/* Button 1: New Farmer Batch */}
         <div 
-          onClick={() => setActiveForm('createBatchForFarmer')}
+          onClick={() => {
+            if (onOpenNewBatch) {
+              onOpenNewBatch();
+            } else {
+              setActiveForm('createBatchForFarmer');
+            }
+          }}
           className="bg-white hover:bg-emerald-50/40 border border-slate-200/90 hover:border-emerald-300 rounded-2xl p-4 sm:p-4.5 flex flex-col justify-between text-left cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative"
         >
           <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mb-3 shadow-inner">
@@ -461,7 +478,13 @@ const AggregatorView = ({ userId }: AggregatorViewProps) => {
                         </p>
                       </div>
                       <Button
-                        onClick={() => setActiveForm('createBatchForFarmer')}
+                        onClick={() => {
+                          if (onOpenNewBatch) {
+                            onOpenNewBatch();
+                          } else {
+                            setActiveForm('createBatchForFarmer');
+                          }
+                        }}
                         className="mt-2 bg-[#0d5c3a] hover:bg-[#09462b] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-sm transition-all"
                       >
                         <Plus className="w-3.5 h-3.5 mr-1" strokeWidth={3} />
@@ -801,21 +824,6 @@ const AggregatorView = ({ userId }: AggregatorViewProps) => {
                 EXECUTE SYSTEM-WIDE RECALL
               </Button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={activeForm === 'createBatchForFarmer'} onOpenChange={(open) => !open && setActiveForm(null)}>
-        <DialogContent className="sm:max-w-4xl bg-white/95 backdrop-blur-2xl border border-emerald-200/60 rounded-[2.5rem] p-0 overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
-          <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain">
-            <CreateBatchForFarmerComponent 
-              collectorName="Senior Field Aggregator"
-              collectorId={userId}
-              onBatchCreated={(batchId, farmerId) => {
-                // Keep dialog open to show the success screen
-              }}
-              onClose={() => setActiveForm(null)}
-            />
           </div>
         </DialogContent>
       </Dialog>

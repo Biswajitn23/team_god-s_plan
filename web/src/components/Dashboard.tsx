@@ -31,6 +31,8 @@ import ProcessorView from './roles/ProcessorView';
 import ManufacturerView from './roles/ManufacturerView';
 import DistributorView from './roles/DistributorView';
 import FarmerView from './roles/FarmerView';
+import CreateBatchForFarmerComponent from './CreateBatchForFarmerComponent';
+import { ChevronDown } from 'lucide-react';
 
 interface DashboardProps {
   userRole: string;
@@ -41,6 +43,7 @@ interface DashboardProps {
 const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [profileData, setProfileData] = useState<any>(null);
+  const [currentSubView, setCurrentSubView] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -68,6 +71,14 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
     manufacturer: 'Manufacturer / Formulation',
     distributor: 'Distributor / Logistics',
     farmer: 'Farmer / Grower Portal'
+  };
+
+  const roleOfficerTitles: Record<string, string> = {
+    aggregator: 'Senior Field Aggregator',
+    processor: 'Quality & Extraction Officer',
+    manufacturer: 'GMP Production Controller',
+    distributor: 'Logistics Operations Lead',
+    farmer: 'Registered AYUSH Farmer'
   };
 
   return (
@@ -163,6 +174,17 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
               </span>
             </div>
 
+            {/* Operating Officer Badge Pill */}
+            <div className="hidden xl:flex items-center gap-2 bg-slate-50 border border-slate-200/90 rounded-full py-1.5 px-3.5 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-[#0d5c3a] text-white flex items-center justify-center text-xs font-bold shrink-0">
+                <User className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-slate-800">
+                {roleOfficerTitles[userRole] || 'Operating Officer'} ({userId || 'AGG-1001'})
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+
             {/* Notification Bell */}
             <button 
               aria-label="Notifications"
@@ -190,11 +212,27 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
       <div className="bg-[#1b4d3e] text-emerald-100 py-2.5 px-4 sm:px-8 shadow-inner relative z-20">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between text-xs">
           <div className="flex items-center gap-2 font-medium">
-            <Home className="w-3.5 h-3.5 text-emerald-300" />
+            <Home 
+              className="w-3.5 h-3.5 text-emerald-300 cursor-pointer hover:text-white transition-colors" 
+              onClick={() => setCurrentSubView(null)}
+            />
             <span className="text-emerald-300/60 font-mono">&gt;</span>
-            <span className="text-white font-semibold tracking-wide">
+            <span 
+              onClick={() => setCurrentSubView(null)}
+              className={`cursor-pointer transition-colors ${
+                currentSubView ? 'text-emerald-200 hover:text-white hover:underline' : 'text-white font-semibold tracking-wide'
+              }`}
+            >
               {roleDisplayNames[userRole] || userRole}
             </span>
+            {currentSubView === 'new-farmer-batch' && (
+              <>
+                <span className="text-emerald-300/60 font-mono">&gt;</span>
+                <span className="text-white font-semibold tracking-wide">
+                  New Farmer Batch
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -211,157 +249,175 @@ const Dashboard = ({ userRole, userId, onLogout }: DashboardProps) => {
       {/* 3. MAIN WORKSPACE AREA                                                   */}
       {/* ========================================================================= */}
       <main className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {currentSubView === 'new-farmer-batch' ? (
+          <div className="w-full">
+            <CreateBatchForFarmerComponent
+              collectorName={roleOfficerTitles[userRole] || 'Senior Field Aggregator'}
+              collectorId={userId || 'AGG-1001'}
+              onClose={() => setCurrentSubView(null)}
+              onBatchCreated={() => {
+                // Batch created
+              }}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-          {/* ------------------------------------------------------------------- */}
-          {/* LEFT SIDEBAR: PROFILE & SYSTEM VERIFICATION (3 COLS)                */}
-          {/* ------------------------------------------------------------------- */}
-          <div className="lg:col-span-3 space-y-4">
-            
-            {/* User Profile Card */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm relative overflow-hidden">
-              <div className="flex flex-col items-center text-center">
-                {/* Avatar Badge */}
-                <div className="w-20 h-20 rounded-full bg-[#1b4d3e] text-white flex items-center justify-center text-3xl font-black shadow-md border-4 border-emerald-50 mb-3">
-                  {userId ? userId.charAt(0).toUpperCase() : 'A'}
-                </div>
-
-                <h2 className="text-xl font-bold font-mono text-slate-900 tracking-tight">
-                  {userId}
-                </h2>
-                
-                <span className="inline-block mt-1 px-3.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-[#0d5c3a] capitalize">
-                  {userRole}
-                </span>
-
-                {profileData && (
-                  <div className="mt-2 text-center">
-                    <p className="text-xs font-bold text-slate-800">{profileData.name}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">📍 {profileData.location}</p>
-                  </div>
-                )}
-
-                {/* Metadata Table */}
-                <div className="w-full mt-6 pt-5 border-t border-slate-100 space-y-2.5 text-left text-xs">
-                  <div className="flex items-center justify-between text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Terminal ID</span>
-                    </div>
-                    <span className="font-mono font-bold text-slate-800">
-                      ST-{userId.split('-')[1] || '1001'}
-                    </span>
+            {/* ------------------------------------------------------------------- */}
+            {/* LEFT SIDEBAR: PROFILE & SYSTEM VERIFICATION (3 COLS)                */}
+            {/* ------------------------------------------------------------------- */}
+            <div className="lg:col-span-3 space-y-4">
+              
+              {/* User Profile Card */}
+              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                <div className="flex flex-col items-center text-center">
+                  {/* Avatar Badge */}
+                  <div className="w-20 h-20 rounded-full bg-[#1b4d3e] text-white flex items-center justify-center text-3xl font-black shadow-md border-4 border-emerald-50 mb-3">
+                    {userId ? userId.charAt(0).toUpperCase() : 'A'}
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Clearance</span>
-                    </div>
-                    <span className="font-bold text-slate-800 uppercase text-[11px]">
-                      ALPHA
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Joined On</span>
-                    </div>
-                    <span className="font-medium text-slate-800">
-                      Feb 2024
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <Layers className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Integrity Sync</span>
-                    </div>
-                    <span className="font-bold text-emerald-700">
-                      Active
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <Lock className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Encryption</span>
-                    </div>
-                    <span className="font-mono font-bold text-slate-800 text-[11px]">
-                      AES-256
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <Radio className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Node Status</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Online</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Government Verified Node Card */}
-            <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-sm flex items-center justify-between gap-3 hover:border-emerald-400 transition-all cursor-pointer group">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#0d5c3a] text-white flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-tight">
-                    Government Verified Node
-                  </h4>
-                  <p className="text-[10px] text-slate-500 leading-tight">
-                    Authorized under Ministry of Ayush
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-colors" />
-            </div>
-
-            {/* Ayush Aatmanirbhar Bharat Poster Card */}
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-amber-50 via-orange-50 to-emerald-50 p-4 border border-orange-200/60 shadow-sm">
-              <div className="flex items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wide">
-                    आयुष से
+                  <h2 className="text-xl font-bold font-mono text-slate-900 tracking-tight">
+                    {userId}
+                  </h2>
+                  
+                  <span className="inline-block mt-1 px-3.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-[#0d5c3a] capitalize">
+                    {userRole}
                   </span>
-                  <h4 className="text-sm sm:text-base font-black text-slate-900 font-serif leading-tight">
-                    आत्मनिर्भर भारत
-                  </h4>
-                  <p className="text-[9px] text-slate-600 font-medium">
-                    Our Herbs. Our Heritage. A Healthier Future.
-                  </p>
+
+                  {profileData && (
+                    <div className="mt-2 text-center">
+                      <p className="text-xs font-bold text-slate-800">{profileData.name}</p>
+                      <p className="text-[10px] text-slate-500 font-medium">📍 {profileData.location}</p>
+                    </div>
+                  )}
+
+                  {/* Metadata Table */}
+                  <div className="w-full mt-6 pt-5 border-t border-slate-100 space-y-2.5 text-left text-xs">
+                    <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Terminal ID</span>
+                      </div>
+                      <span className="font-mono font-bold text-slate-800">
+                        ST-{userId.split('-')[1] || '1001'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Clearance</span>
+                      </div>
+                      <span className="font-bold text-slate-800 uppercase text-[11px]">
+                        ALPHA
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Joined On</span>
+                      </div>
+                      <span className="font-medium text-slate-800">
+                        Feb 2024
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <Layers className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Integrity Sync</span>
+                      </div>
+                      <span className="font-bold text-emerald-700">
+                        Active
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Encryption</span>
+                      </div>
+                      <span className="font-mono font-bold text-slate-800 text-[11px]">
+                        AES-256
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <Radio className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Node Status</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>Online</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center shrink-0">
-                  <Leaf className="w-5 h-5 text-[#0d5c3a]" />
+              </div>
+
+              {/* Government Verified Node Card */}
+              <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-sm flex items-center justify-between gap-3 hover:border-emerald-400 transition-all cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#0d5c3a] text-white flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900 leading-tight">
+                      Government Verified Node
+                    </h4>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      Authorized under Ministry of Ayush
+                    </p>
+                  </div>
                 </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-colors" />
+              </div>
+
+              {/* Ayush Aatmanirbhar Bharat Poster Card */}
+              <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-amber-50 via-orange-50 to-emerald-50 p-4 border border-orange-200/60 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wide">
+                      आयुष से
+                    </span>
+                    <h4 className="text-sm sm:text-base font-black text-slate-900 font-serif leading-tight">
+                      आत्मनिर्भर भारत
+                    </h4>
+                    <p className="text-[9px] text-slate-600 font-medium">
+                      Our Herbs. Our Heritage. A Healthier Future.
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center shrink-0">
+                    <Leaf className="w-5 h-5 text-[#0d5c3a]" />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* ------------------------------------------------------------------- */}
+            {/* RIGHT MAIN WORKSPACE (9 COLS)                                       */}
+            {/* ------------------------------------------------------------------- */}
+            <div className="lg:col-span-9 space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 sm:p-7 relative overflow-hidden">
+                {/* Render Selected Role View */}
+                {userRole === 'aggregator' && (
+                  <AggregatorView
+                    userId={userId}
+                    onOpenNewBatch={() => setCurrentSubView('new-farmer-batch')}
+                  />
+                )}
+                {userRole === 'processor' && <ProcessorView userId={userId} />}
+                {userRole === 'manufacturer' && <ManufacturerView userId={userId} />}
+                {userRole === 'distributor' && <DistributorView userId={userId} />}
+                {userRole === 'farmer' && <FarmerView userId={userId} />}
               </div>
             </div>
 
           </div>
-
-          {/* ------------------------------------------------------------------- */}
-          {/* RIGHT MAIN WORKSPACE (9 COLS)                                       */}
-          {/* ------------------------------------------------------------------- */}
-          <div className="lg:col-span-9 space-y-6">
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 sm:p-7 relative overflow-hidden">
-              {/* Render Selected Role View */}
-              {userRole === 'aggregator' && <AggregatorView userId={userId} />}
-              {userRole === 'processor' && <ProcessorView userId={userId} />}
-              {userRole === 'manufacturer' && <ManufacturerView userId={userId} />}
-              {userRole === 'distributor' && <DistributorView userId={userId} />}
-              {userRole === 'farmer' && <FarmerView userId={userId} />}
-            </div>
-          </div>
-
-        </div>
+        )}
       </main>
 
       {/* ========================================================================= */}
