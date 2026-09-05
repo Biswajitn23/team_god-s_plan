@@ -5,7 +5,7 @@
 > **From collection to consumer — connecting every stakeholder, tracking every batch, and building trust through digital traceability.**
 
 <p align="center">
-  <img src="app/src/assets/ayuestufrontpage.png" alt="Ayu-Setu Platform" width="900">
+  <img src="app/src/assets/ayuestufrontpage.png" alt="Ayu-Setu Platform" width="200">
 </p>
 
 <p align="center">
