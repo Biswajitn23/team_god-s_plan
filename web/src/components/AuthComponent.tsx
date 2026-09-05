@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { WelcomeScreen } from './WelcomeScreen';
 import { RoleSelectionScreen } from './RoleSelectionScreen';
+import { RoleLoginScreen } from './RoleLoginScreen';
 
 interface AuthComponentProps {
   onLogin: (role: string, userId: string) => void;
@@ -582,6 +583,64 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
         <RoleSelectionScreen
           onSelectRole={handleRoleSelect}
           onBackToHome={() => setHasStarted(false)}
+        />
+      </>
+    );
+  }
+
+  if (step === 'credentials-entry' && selectedRole) {
+    return (
+      <>
+        {isAuthLoading && <AyuLoader />}
+        <RoleLoginScreen
+          selectedRole={selectedRole}
+          onBackToRoles={() => setStep('role-selection')}
+          credentials={credentials}
+          onChangeCredential={handleCredentialChange}
+          onSubmit={handleContinue}
+          isLoading={isLoading}
+          farmerTab={farmerTab}
+          setFarmerTab={setFarmerTab}
+          onFarmerSearch={async () => {
+            if (!credentials.aggregatorId) {
+              toast({ title: "Input Required", description: "Please enter your Identity PIN.", variant: "destructive" });
+              return;
+            }
+            setIsLoading(true);
+            try {
+              const searchId = credentials.aggregatorId.toUpperCase();
+              let docRef = doc(firestore, 'farmers', searchId);
+              let docSnap = await getDoc(docRef);
+              if (!docSnap.exists()) {
+                const { query, collection, where, getDocs, limit } = await import('firebase/firestore');
+                const q = query(collection(firestore, 'farmers'), where('id', '==', searchId), limit(1));
+                const snapshot = await getDocs(q);
+                if (!snapshot.empty) {
+                  docSnap = snapshot.docs[0] as any;
+                }
+              }
+              if (docSnap && docSnap.exists()) {
+                const data = docSnap.data();
+                setCredentials({
+                  ...credentials,
+                  fullName: data.fullName || data.name || '',
+                  mobile: data.mobile || '',
+                  location: data.location || '',
+                  pincode: data.pincode || '',
+                  farmerType: data.type || 'farmer'
+                });
+                setFarmerTab('new');
+                toast({ title: "Profile Located", description: `Identity verified for ${data.fullName || data.name}.` });
+              } else {
+                toast({ title: "PIN Not Found", description: "No record matches this identity in the global registry.", variant: "destructive" });
+              }
+            } catch (err) {
+              toast({ title: "Lookup Failed", description: "Could not fetch registry data.", variant: "destructive" });
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          onPincodeChange={handlePincodeUpdate}
         />
       </>
     );
