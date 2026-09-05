@@ -291,13 +291,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
               </div>
             </div>
 
-            {/* CTAs: Get Started Button & QR Verify */}
-            <div className="pt-4 flex flex-wrap items-center gap-4">
+            {/* CTAs: Get Started Button, QR Verify, and Verify Product */}
+            <div className="pt-4 flex flex-wrap items-center gap-3 sm:gap-4">
               {/* Primary "Get Started >" Button */}
               <button
                 id="get-started-btn"
                 onClick={onGetStarted}
-                className="group relative inline-flex items-center justify-center h-14 sm:h-16 px-8 sm:px-10 rounded-full bg-[#0d5c3a] hover:bg-[#09462b] text-white font-bold text-lg sm:text-xl shadow-[0_10px_25px_rgba(13,92,58,0.35)] hover:shadow-[0_15px_30px_rgba(13,92,58,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 overflow-hidden"
+                className="group relative inline-flex items-center justify-center h-14 sm:h-16 px-8 sm:px-10 rounded-full bg-[#0d5c3a] hover:bg-[#09462b] text-white font-bold text-lg sm:text-xl shadow-[0_10px_25px_rgba(13,92,58,0.35)] hover:shadow-[0_15px_30px_rgba(13,92,58,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 overflow-hidden cursor-pointer"
               >
                 <span className="mr-2 tracking-wide font-sans">Get Started</span>
                 <ChevronRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" strokeWidth={2.8} />
@@ -307,15 +307,26 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) =>
                 </div>
               </button>
 
-              {/* Public Consumer Quick Verify Link */}
+              {/* Public Consumer Quick Verify Batch Link */}
               <button
-                id="verify-product-btn"
-                onClick={() => navigate('/verify-product')}
+                id="verify-batch-btn"
+                onClick={() => navigate('/verify')}
                 className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
               >
                 <QrCode className="w-4 h-4 text-[#0d5c3a]" />
-                <span>Verify Product</span>
+                <span>Verify Herb Batch / QR</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700" />
+              </button>
+
+              {/* Verify Product Standalone App Link */}
+              <button
+                id="verify-product-btn"
+                onClick={() => navigate('/verify-product')}
+                className="group inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-[#0d5c3a]/10 hover:bg-[#0d5c3a] text-[#0d5c3a] hover:text-white border border-[#0d5c3a]/30 hover:border-[#0d5c3a] font-bold text-sm shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4 text-[#0d5c3a] group-hover:text-emerald-200 transition-colors" />
+                <span>Verify Product</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#0d5c3a] group-hover:text-white group-hover:translate-x-0.5 transition-all" />
               </button>
             </div>
 
