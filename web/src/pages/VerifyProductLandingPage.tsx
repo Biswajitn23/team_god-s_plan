@@ -22,9 +22,42 @@ import {
   AlertTriangle,
   Link as LinkIcon,
   Phone,
-  Home
+  Home,
+  Download,
+  Maximize2,
+  Copy,
+  Check,
+  Smartphone,
+  X
 } from 'lucide-react';
+import QRCode from 'react-qr-code';
 import thakurYograjStudio from '@/assets/thakur-yograj-studio.jpg';
+
+const downloadQR = (elementId: string, filename: string) => {
+  const container = document.getElementById(elementId);
+  if (!container) return;
+  const svg = container.tagName.toLowerCase() === 'svg' ? container : container.querySelector('svg');
+  if (!svg) return;
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.width + 40;
+    canvas.height = img.height + 40;
+    if (ctx) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 20, 20);
+      const pngFile = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `${filename}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    }
+  };
+  img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+};
 
 export const VerifyProductLandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +65,18 @@ export const VerifyProductLandingPage: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [showReportModal, setShowReportModal] = useState<boolean>(false);
+  const [showQrModal, setShowQrModal] = useState<boolean>(false);
+  const publicVerifyUrl = 'https://web-lemon-psi-69.vercel.app/verify-product';
+  const activeQrUrl = publicVerifyUrl;
+
+  const copyToClipboard = (text?: string) => {
+    const urlToCopy = text || activeQrUrl;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(urlToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -46,11 +91,7 @@ export const VerifyProductLandingPage: React.FC = () => {
   }, []);
 
   const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    }
+    copyToClipboard(activeQrUrl);
     setShowShareModal(true);
   };
 
@@ -246,26 +287,113 @@ export const VerifyProductLandingPage: React.FC = () => {
 
             </div>
 
-            {/* Scan QR to View Card */}
-            <div className="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-xs flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0">
-                  <QrCode className="w-6 h-6 text-[#0d5c3a]" />
+            {/* Scan QR to View Card - Live Scannable 2D QR Code */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-3">
+              {/* Card Header */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#0d5c3a] shrink-0">
+                    <QrCode className="w-4 h-4" />
+                  </div>
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-xs font-bold text-slate-900">Scan QR Code</span>
+                    <span className="text-[11px] font-bold text-[#0d5c3a]">on AyuSetu</span>
+                    <span className="text-[9px] text-slate-500 font-medium">सत्यापन हेतु QR कोड</span>
+                  </div>
                 </div>
-                <div className="flex flex-col leading-tight">
-                  <span className="text-xs font-bold text-slate-900">Scan QR to view</span>
-                  <span className="text-[11px] font-bold text-[#0d5c3a]">on AyuSetu</span>
-                  <span className="text-[9px] text-slate-500 font-medium">सत्यापन के लिए QR स्कैन करें</span>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setShowQrModal(true)}
+                    title="Enlarge QR Code"
+                    className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 flex items-center justify-center text-slate-600 hover:text-[#0d5c3a] transition-all cursor-pointer"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    title="Share Verification Link"
+                    className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 flex items-center justify-center text-slate-600 hover:text-[#0d5c3a] transition-all cursor-pointer"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
-              <button
-                onClick={handleShare}
-                title="Share Verification Link"
-                className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 flex items-center justify-center text-slate-600 hover:text-[#0d5c3a] transition-all cursor-pointer"
+              {/* Scannable QR Code Visual Box with Viewfinder Corner Brackets */}
+              <div 
+                onClick={() => setShowQrModal(true)}
+                className="relative bg-gradient-to-b from-emerald-50/50 via-slate-50/30 to-white rounded-xl p-3 border border-emerald-100 flex flex-col items-center justify-center cursor-pointer group hover:border-emerald-300 transition-all shadow-xs"
               >
-                <Share2 className="w-4 h-4" />
-              </button>
+                {/* Viewfinder corner guides */}
+                <div className="absolute top-2 left-2 w-3.5 h-3.5 border-t-2 border-l-2 border-[#0d5c3a] rounded-tl pointer-events-none" />
+                <div className="absolute top-2 right-2 w-3.5 h-3.5 border-t-2 border-r-2 border-[#0d5c3a] rounded-tr pointer-events-none" />
+                <div className="absolute bottom-2 left-2 w-3.5 h-3.5 border-b-2 border-l-2 border-[#0d5c3a] rounded-bl pointer-events-none" />
+                <div className="absolute bottom-2 right-2 w-3.5 h-3.5 border-b-2 border-r-2 border-[#0d5c3a] rounded-br pointer-events-none" />
+
+                {/* Scannable QR Code SVG */}
+                <div id="product-landing-qr" className="p-2.5 bg-white rounded-lg border border-slate-200 shadow-xs">
+                  <QRCode
+                    value={activeQrUrl}
+                    size={148}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    viewBox={`0 0 256 256`}
+                    level="M"
+                  />
+                </div>
+
+                <div className="mt-2 text-center">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-800 group-hover:text-[#0d5c3a] transition-colors">
+                    <Smartphone className="w-3.5 h-3.5 text-[#0d5c3a]" />
+                    Point Camera to Scan & Open
+                  </span>
+                  <span className="block text-[9px] text-slate-500 font-medium">
+                    फोन कैमरा या गूगल लेंस से सीधे खोलें
+                  </span>
+                </div>
+              </div>
+
+              {/* Public Verification Target URL */}
+              <div className="space-y-1 pt-0.5">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="font-bold text-slate-600">Verification URL:</span>
+                  <span className="text-[9px] font-bold text-[#0d5c3a] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    Public Web & Mobile Scannable
+                  </span>
+                </div>
+
+                {/* Active URL string with quick copy */}
+                <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between gap-1 text-[9px] font-mono text-slate-700">
+                  <span className="truncate" title={activeQrUrl}>{activeQrUrl}</span>
+                  <button
+                    onClick={() => copyToClipboard(activeQrUrl)}
+                    className="shrink-0 p-1 hover:text-[#0d5c3a] text-slate-500 rounded hover:bg-slate-200/60 cursor-pointer"
+                    title="Copy Link"
+                  >
+                    {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons: Download QR & Test Open */}
+              <div className="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  onClick={() => downloadQR('product-landing-qr', 'thakur-yograj-verify-qr')}
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-[10px] font-bold text-slate-700 hover:text-[#0d5c3a] transition-all cursor-pointer"
+                >
+                  <Download className="w-3 h-3 text-[#0d5c3a]" />
+                  <span>Download QR</span>
+                </button>
+                <a
+                  href={activeQrUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[10px] font-bold text-[#0d5c3a] transition-all cursor-pointer"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open Page</span>
+                </a>
+              </div>
             </div>
 
             {/* 100% Authentic Guaranteed Card */}
@@ -678,17 +806,110 @@ export const VerifyProductLandingPage: React.FC = () => {
         </div>
       </footer>
 
+      {/* Fullscreen / Zoom QR Modal */}
+      {showQrModal && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setShowQrModal(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-sm w-full p-6 border border-slate-200 shadow-2xl space-y-4 text-center relative animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowQrModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center justify-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#0d5c3a]">
+                <QrCode className="w-5 h-5" />
+              </div>
+              <div className="text-left leading-tight">
+                <h3 className="text-sm font-bold text-slate-900">AyuSetu Product QR Code</h3>
+                <p className="text-[10px] text-slate-500 font-medium">Thakur Yograj Herbal Hair Oil Verification</p>
+              </div>
+            </div>
+
+            {/* High-res QR Display */}
+            <div className="p-4 bg-white border-2 border-[#0d5c3a] rounded-2xl inline-block shadow-md">
+              <div id="modal-landing-qr">
+                <QRCode
+                  value={activeQrUrl}
+                  size={200}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  viewBox={`0 0 256 256`}
+                  level="M"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1 text-xs text-slate-600">
+              <p className="font-semibold text-slate-800">
+                Point any phone camera or Google Lens at this QR code
+              </p>
+              <p className="text-[11px] text-slate-500">
+                फोन के कैमरे या गूगल लेंस से सीधे स्कैन करें
+              </p>
+            </div>
+
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[10px] font-mono text-slate-700 truncate">
+              {activeQrUrl}
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                onClick={() => downloadQR('modal-landing-qr', 'thakur-yograj-verify-qr')}
+                className="flex-1 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-[#0d5c3a]" />
+                Download PNG
+              </button>
+              <button
+                onClick={() => setShowQrModal(false)}
+                className="flex-1 h-9 rounded-xl bg-[#0d5c3a] hover:bg-[#0b4d30] text-white text-xs font-bold cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Share Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-4">
-            <h3 className="text-sm font-bold text-slate-900">Share Product Verification</h3>
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setShowShareModal(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900">Share Product Verification</h3>
+              <button onClick={() => setShowShareModal(false)} className="text-slate-400 hover:text-slate-700 p-1 rounded-lg">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <QRCode value={activeQrUrl} size={130} />
+            </div>
+
             <p className="text-xs text-slate-600">
-              Link has been copied to your clipboard! You can share this URL with any consumer or regulator to verify the Thakur Yograj Hair Oil provenance on-chain.
+              Link has been copied to your clipboard! Share this URL or QR code with consumers or retailers to verify product authenticity.
             </p>
+
+            <div className="p-2 bg-slate-100 rounded-lg text-[10px] font-mono text-slate-700 truncate">
+              {activeQrUrl}
+            </div>
+
             <button
               onClick={() => setShowShareModal(false)}
-              className="w-full h-10 rounded-xl bg-[#0d5c3a] text-white text-xs font-bold"
+              className="w-full h-10 rounded-xl bg-[#0d5c3a] text-white text-xs font-bold cursor-pointer hover:bg-[#0b4d30] transition-colors"
             >
               Done
             </button>

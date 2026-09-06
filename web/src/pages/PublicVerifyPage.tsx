@@ -412,7 +412,7 @@ const PublicVerifyPage = () => {
       return `https://web-lemon-psi-69.vercel.app/verify/${id}`;
     }
     if (mode === 'mobile') {
-      return `http://192.168.137.65:8080/verify/${id}`;
+      return `http://192.168.137.222:8080/verify/${id}`;
     }
     return `${window.location.origin}/verify/${id}`;
   };
