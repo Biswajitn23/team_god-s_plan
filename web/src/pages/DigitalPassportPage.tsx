@@ -105,10 +105,10 @@ export const DigitalPassportPage: React.FC = () => {
       title: 'Formulation',
       icon: '💊',
       date: '12 Aug 2026',
-      actor: 'Ayurveda Life Labs Pvt. Ltd.',
-      location: 'Satara GMP Campus',
-      lot: 'MFG-BATCH-2026-001',
-      details: 'Standardized blend formulation with bio-enhancers, automated capsule encapsulation, high-barrier induction seal, and laser etched serial PX-82K9J.',
+      actor: 'Thakur Yograj Formulation Campus',
+      location: 'Raipur, Chhattisgarh',
+      lot: 'TY-BATCH-2026-001',
+      details: 'Cold-pressed botanical herb infusion with Bhringraj, Amla, and Hibiscus, automated packaging into 250ml bottles, tamper-evident induction cap, and laser etched serial PX-82K9J.',
       verifiedBy: 'Chief Production Officer',
       badge: 'AYUSH GMP Certified'
     },
@@ -118,8 +118,8 @@ export const DigitalPassportPage: React.FC = () => {
       icon: '📦',
       date: '24 Aug 2026',
       actor: 'All-India National Logistics Hub',
-      location: 'Nagpur Central Depot',
-      lot: 'AT-2026-001',
+      location: 'Raipur Central Depot',
+      lot: 'TY-2026-001',
       details: 'Secure palletization, digital temperature-monitored distribution tracking, and tamper-evident consumer QR cryptographic key generation.',
       verifiedBy: 'Supply Chain Controller',
       badge: 'Tamper-Evident QR'
@@ -131,16 +131,16 @@ export const DigitalPassportPage: React.FC = () => {
     source: {
       title: 'Source Lot',
       lotId: 'SRC-MP-9941',
-      quantity: '1,200 kg Raw Roots',
+      quantity: '1,200 kg Raw Herbs',
       timestamp: '14 May 2026 • 07:30 AM',
-      actor: 'Chhindwara Forest Harvester Union',
+      actor: 'Tribal Herbal Harvester Union',
       status: 'Harvest Verified',
       hash: '0x9a8f...411e'
     },
     raw: {
       title: 'Raw Material Lot',
-      lotId: 'RAW-ASH-00182',
-      quantity: '1,180 kg Sorted Roots',
+      lotId: 'RAW-HERB-00182',
+      quantity: '1,180 kg Sorted Herbs',
       timestamp: '18 May 2026 • 11:15 AM',
       actor: 'Kisan Herbal Aggregator Depot',
       status: 'Mandi Cleared',
@@ -148,35 +148,35 @@ export const DigitalPassportPage: React.FC = () => {
     },
     processed: {
       title: 'Processed Lot',
-      lotId: 'PROC-ASH-00091',
+      lotId: 'PROC-HERB-00091',
       quantity: '850 kg Standardized Extract',
       timestamp: '02 Jun 2026 • 03:40 PM',
-      actor: 'Western Ghats Bio-Extracts Plant',
+      actor: 'Bio-Extracts Processing Plant',
       status: 'Extraction Certified',
       hash: '0xfe31...77d8'
     },
     powder: {
-      title: 'Powder Lot',
-      lotId: 'POW-ASH-0442',
-      quantity: '840 kg Fine Mesh Botanical Powder',
+      title: 'Extract Blend Lot',
+      lotId: 'EXT-OIL-0442',
+      quantity: '840 L Herb Oil Concentrate',
       timestamp: '20 Jun 2026 • 09:20 AM',
-      actor: 'Precision Milling Unit #3',
-      status: 'Mesh 80 Tested',
+      actor: 'Precision Extraction Unit #3',
+      status: 'Purity Tested',
       hash: '0x33ca...61a2'
     },
     formulation: {
       title: 'Formulation Batch',
-      lotId: 'MFG-BATCH-2026-001',
-      quantity: '5,000 Finished Units (60s)',
+      lotId: 'TY-BATCH-2026-001',
+      quantity: '5,000 Finished Bottles (250ml)',
       timestamp: '12 Aug 2026 • 02:00 PM',
-      actor: 'Ayurveda Life Labs Pvt. Ltd.',
+      actor: 'Thakur Yograj (Raipur, Chhattisgarh)',
       status: 'Batch Released',
       hash: '0x7e29...12c9'
     },
     final: {
       title: 'Final Product Serial',
-      lotId: 'AT-2026-001 (PX-82K9J)',
-      quantity: '1 Unit (Retail Pack)',
+      lotId: 'TY-2026-001 (PX-82K9J)',
+      quantity: '1 Unit (250ml Pack)',
       timestamp: '24 Aug 2026 • 04:30 PM',
       actor: 'Authorized National Logistics Chain',
       status: 'Consumer Ready',
@@ -255,15 +255,17 @@ export const DigitalPassportPage: React.FC = () => {
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black text-slate-900 tracking-tight">
-                ASHWAGANDHA FORMULATION
+                THAKUR YOGRAJ HAIR OIL
               </h1>
 
               <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-600 font-serif italic">
-                <span>Withania somnifera (L.) Dunal</span>
+                <span>Bhringraj, Amla, Hibiscus & Herbal Extracts</span>
                 <span>•</span>
-                <span>Batch: <strong className="font-mono not-italic text-slate-800">AT-2026-001</strong></span>
+                <span>Manufacturer: <strong className="not-italic text-slate-800 font-semibold">Thakur Yograj, Raipur, Chhattisgarh</strong></span>
                 <span>•</span>
-                <span>Lot: RAW-ASH-00182</span>
+                <span>Batch: <strong className="font-mono not-italic text-slate-800">TY-2026-001</strong></span>
+                <span>•</span>
+                <span>Mfd: <strong className="not-italic text-emerald-800 font-semibold">July 2026 to June 2028</strong></span>
               </div>
             </div>
 

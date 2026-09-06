@@ -152,12 +152,12 @@ export const VerifyProductLandingPage: React.FC = () => {
               {/* Product Title & Botanical Taxon */}
               <div className="space-y-1">
                 <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
-                  Ashwagandha Formulation
+                  Thakur Yograj Hair Oil
                 </h2>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-800 font-serif italic font-semibold">
-                  <span>Withania somnifera (L.) Dunal</span>
+                  <span>Bhringraj, Amla, Hibiscus & Herbal Extracts</span>
                   <span>•</span>
-                  <span>Root Botanical Extract</span>
+                  <span>100% Ayurvedic Hair Oil</span>
                 </div>
               </div>
 
@@ -170,10 +170,10 @@ export const VerifyProductLandingPage: React.FC = () => {
                     <span>Manufacturer</span>
                   </div>
                   <p className="font-bold text-slate-900 text-xs sm:text-sm">
-                    Ayurveda Life Labs
+                    Thakur Yograj
                   </p>
                   <span className="text-[10px] text-emerald-700 font-semibold block">
-                    Licensed GMP Manufacturing Unit
+                    Raipur, Chhattisgarh
                   </span>
                 </div>
 
@@ -183,10 +183,10 @@ export const VerifyProductLandingPage: React.FC = () => {
                     <span>Batch Number</span>
                   </div>
                   <p className="font-mono font-black text-slate-900 text-xs sm:text-sm">
-                    AT-2026-001
+                    TY-2026-001
                   </p>
                   <span className="text-[10px] text-slate-500 block">
-                    Lot Size: 5,000 Units
+                    Lot Size: 5,000 Bottles (250ml)
                   </span>
                 </div>
 
@@ -196,10 +196,10 @@ export const VerifyProductLandingPage: React.FC = () => {
                     <span>Manufacturing Date</span>
                   </div>
                   <p className="font-bold text-slate-900 text-xs sm:text-sm">
-                    12 Aug 2026
+                    July 2026
                   </p>
                   <span className="text-[10px] text-slate-500 block">
-                    Expiry: Aug 2028 (24 Months)
+                    Expiry: June 2028 (24 Months)
                   </span>
                 </div>
 
@@ -209,10 +209,10 @@ export const VerifyProductLandingPage: React.FC = () => {
                     <span>Active Standard</span>
                   </div>
                   <p className="font-bold text-emerald-800 text-xs sm:text-sm">
-                    Withanolides: 5.4%
+                    100% Ayurvedic
                   </p>
                   <span className="text-[10px] text-emerald-700 font-semibold block">
-                    API Standard: &gt; 2.5% (PASSED)
+                    Chemical Free • Hairs Strengthening
                   </span>
                 </div>
 
