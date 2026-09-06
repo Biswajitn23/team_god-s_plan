@@ -29,7 +29,7 @@ import {
   Activity,
   Award
 } from 'lucide-react';
-import thakurYograjProduct from '@/assets/thakur-yograj-1.png';
+import thakurYograjStudio from '@/assets/thakur-yograj-studio.jpg';
 
 export const DigitalPassportPage: React.FC = () => {
   const navigate = useNavigate();

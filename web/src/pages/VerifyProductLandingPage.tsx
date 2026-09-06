@@ -14,7 +14,7 @@ import {
   Fingerprint,
   MapPin
 } from 'lucide-react';
-import thakurYograjProduct from '@/assets/thakur-yograj-1.png';
+import thakurYograjStudio from '@/assets/thakur-yograj-studio.jpg';
 
 export const VerifyProductLandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -101,12 +101,12 @@ export const VerifyProductLandingPage: React.FC = () => {
             </div>
 
             {/* Real Uploaded Ayurvedic Product Image */}
-            <div className="relative my-6 group">
-              <div className="w-56 sm:w-64 h-72 sm:h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-white flex items-center justify-center relative">
+            <div className="relative my-6 group w-full flex justify-center">
+              <div className="w-64 sm:w-72 md:w-80 max-w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-[#f6f1e8] flex items-center justify-center relative">
                 <img
-                  src={thakurYograjProduct}
+                  src={thakurYograjStudio}
                   alt="Thakur Yograj Herbal Hair Oil - Real Physical Ayurvedic Product"
-                  className="w-full h-full object-contain p-2 transform group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
                 />
 
                 {/* Laser Scanning Effect Line */}
