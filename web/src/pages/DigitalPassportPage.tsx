@@ -50,29 +50,29 @@ export const DigitalPassportPage: React.FC = () => {
   const [recallSimulated, setRecallSimulated] = useState<boolean>(false);
   const [showRecallModal, setShowRecallModal] = useState<boolean>(false);
 
-  // 6 Stages Data
+  // 6 Stages Data (14 May to 20 July 2026)
   const stages = [
     {
       id: 0,
       title: 'Collection',
       icon: '🌱',
       date: '14 May 2026',
-      actor: 'Chhindwara Forest Tribal Collector Society',
-      location: 'Madhya Pradesh, India',
-      lot: 'RAW-ASH-00182',
-      details: 'Wild-crafted organic root harvesting following National Medicinal Plants Board (NMPB) sustainable collection guidelines. Moisture level tested at 8.4% on field collection.',
-      verifiedBy: 'State Forest Range Officer #MP-204',
+      actor: 'Tribal Herbal Harvester Co-op',
+      location: 'Chhattisgarh & MP Forest Belt',
+      lot: 'RAW-HERB-00182',
+      details: 'Wild-crafted organic root & leaf harvesting (Bhringraj, Amla, Shikakai) following National Medicinal Plants Board (NMPB) sustainable collection guidelines. Moisture level tested at 8.4%.',
+      verifiedBy: 'State Forest Range Officer',
       badge: 'GACP Compliant'
     },
     {
       id: 1,
       title: 'Source',
       icon: '📍',
-      date: '18 May 2026',
+      date: '26 May 2026',
       actor: 'Kisan Herbal Aggregator Depot',
-      location: 'Neemuch Mandi, MP',
-      lot: 'AGG-ASH-7712',
-      details: 'Visual botanic sorting, root size grading (Grade-A thick taproot), foreign matter removal (< 0.5%), and solar shade dehydration.',
+      location: 'Central Mandi Sorting Yard',
+      lot: 'AGG-HERB-7712',
+      details: 'Visual botanic sorting, root size grading (Grade-A organic herbs), foreign matter removal (< 0.5%), and solar shade dehydration.',
       verifiedBy: 'Govt. Mandi Botanical Inspector',
       badge: 'Geo-Tagged Origin'
     },
@@ -80,11 +80,11 @@ export const DigitalPassportPage: React.FC = () => {
       id: 2,
       title: 'Processing',
       icon: '📦',
-      date: '02 Jun 2026',
-      actor: 'Western Ghats Bio-Extracts Plant',
-      location: 'Nashik, Maharashtra',
-      lot: 'PROC-ASH-00091',
-      details: 'Cryogenic micro-pulverization, ethanol-water hydroalcoholic extraction (10:1 ratio), standardized withanolide yield concentration at controlled 45°C.',
+      date: '12 Jun 2026',
+      actor: 'Bio-Extracts Processing Plant',
+      location: 'Herbal Extraction Center',
+      lot: 'PROC-HERB-00091',
+      details: 'Cold-pressed infusion and standardized herbal decoction preparation at controlled temperature to preserve active phytonutrients and essential botanical oils.',
       verifiedBy: 'GMP Quality Assurance Head',
       badge: 'ISO 22000 GMP'
     },
@@ -92,9 +92,9 @@ export const DigitalPassportPage: React.FC = () => {
       id: 3,
       title: 'Laboratory',
       icon: '🧪',
-      date: '15 Jul 2026',
+      date: '28 Jun 2026',
       actor: 'Central AYUSH Analytical Testing Lab',
-      location: 'Pune, Maharashtra',
+      location: 'Pharmacognosy Testing Unit',
       lot: 'LAB-2026-88291',
       details: 'HPTLC botanical fingerprint matching Ayurvedic Pharmacopoeia of India (API). Heavy metals, aflatoxins, and 142 pesticide residues tested below detection limits.',
       verifiedBy: 'Senior Pharmacognosist (NABL)',
@@ -104,11 +104,11 @@ export const DigitalPassportPage: React.FC = () => {
       id: 4,
       title: 'Formulation',
       icon: '💊',
-      date: '12 Aug 2026',
+      date: '10 Jul 2026',
       actor: 'Thakur Yograj Formulation Campus',
       location: 'Raipur, Chhattisgarh',
       lot: 'TY-BATCH-2026-001',
-      details: 'Cold-pressed botanical herb infusion with Bhringraj, Amla, and Hibiscus, automated packaging into 250ml bottles, tamper-evident induction cap, and laser etched serial PX-82K9J.',
+      details: 'Herbal oil compounding, quality blending, automated filling into 220ml bottles, tamper-evident induction seal, and laser etched serial PX-82K9J.',
       verifiedBy: 'Chief Production Officer',
       badge: 'AYUSH GMP Certified'
     },
@@ -116,11 +116,11 @@ export const DigitalPassportPage: React.FC = () => {
       id: 5,
       title: 'Final Product',
       icon: '📦',
-      date: '24 Aug 2026',
+      date: '20 Jul 2026',
       actor: 'All-India National Logistics Hub',
       location: 'Raipur Central Depot',
       lot: 'TY-2026-001',
-      details: 'Secure palletization, digital temperature-monitored distribution tracking, and tamper-evident consumer QR cryptographic key generation.',
+      details: 'Palletized finished stock release, digital temperature-monitored distribution tracking, and tamper-evident consumer QR cryptographic key generation.',
       verifiedBy: 'Supply Chain Controller',
       badge: 'Tamper-Evident QR'
     }
@@ -281,6 +281,55 @@ export const DigitalPassportPage: React.FC = () => {
                     100% Provenance Integrity
                   </span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Official Manufacturer Profile & Specifications Card */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-[#f5faf7] to-slate-50 border border-emerald-200 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-emerald-200/80">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#0d5c3a]" />
+                <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                  Company Name: <strong className="text-[#0d5c3a]">Thakur Yograj</strong>
+                </span>
+              </div>
+              <span className="font-mono text-xs font-black bg-white px-2.5 py-1 rounded-md border border-emerald-300 text-[#0d5c3a] self-start sm:self-auto shadow-2xs">
+                GSTIN: 22MHJPS4647F1ZX
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="md:col-span-2 space-y-1">
+                <span className="text-[10px] font-bold uppercase text-slate-400 block">Company Address</span>
+                <p className="text-slate-700 leading-snug font-medium">
+                  H NO 42 WARD NO 2, RANI DURGAWATI PARA, VILL SIRRI, TILDA, Raipur, Chhattisgarh, 492001 (Chhattisgarh State Code: 22)
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase text-slate-400 block">Contact & Support</span>
+                <p className="text-slate-700"><strong>Email:</strong> thakuryograjj84@gmail.com</p>
+                <p className="text-slate-700"><strong>Call:</strong> +91 82249 05073</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-emerald-200/60 text-[11px] text-slate-700">
+              <div>
+                <span className="text-slate-400 font-bold block text-[10px]">Product / Commodity</span>
+                <strong>Hair Oil</strong>
+              </div>
+              <div>
+                <span className="text-slate-400 font-bold block text-[10px]">Brand</span>
+                <strong>Thakur Yograj</strong>
+              </div>
+              <div>
+                <span className="text-slate-400 font-bold block text-[10px]">Net / Gross Vol</span>
+                <strong>220 ml</strong>
+              </div>
+              <div>
+                <span className="text-slate-400 font-bold block text-[10px]">Origin</span>
+                <strong>India</strong>
               </div>
             </div>
           </div>

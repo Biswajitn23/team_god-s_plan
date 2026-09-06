@@ -151,33 +151,64 @@ export const VerifyProductLandingPage: React.FC = () => {
 
               {/* Product Title & Botanical Taxon */}
               <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Brand:</span>
+                  <span className="text-xs font-black text-[#0d5c3a] uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    Thakur Yograj
+                  </span>
+                  <span className="text-xs text-slate-400">•</span>
+                  <span className="text-xs font-bold text-slate-600">Ayurvedic Hair Care Products</span>
+                </div>
+                
                 <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
-                  Thakur Yograj Hair Oil
+                  Hair Oil
                 </h2>
-                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-800 font-serif italic font-semibold">
-                  <span>Bhringraj, Amla, Hibiscus & Herbal Extracts</span>
+                
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-emerald-800 font-serif italic font-semibold">
+                  <span>Pure Herbal Extracts Formulation</span>
                   <span>•</span>
-                  <span>100% Ayurvedic Hair Oil</span>
+                  <span>Net Vol: <strong className="font-mono not-italic text-slate-800">220 ml</strong></span>
+                  <span>•</span>
+                  <span>Origin: <strong className="not-italic text-slate-800">India</strong></span>
+                </div>
+              </div>
+
+              {/* Manufacturer Official Profile Box */}
+              <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[#0d5c3a] font-black uppercase text-[11px]">
+                    <Building2 className="w-4 h-4 text-[#0d5c3a]" />
+                    <span>Manufacturer: Thakur Yograj</span>
+                  </div>
+                  <span className="font-mono text-[10px] font-black bg-white px-2 py-0.5 rounded border border-emerald-300 text-[#0d5c3a]">
+                    GSTIN: 22MHJPS4647F1ZX
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-snug font-medium">
+                  <strong>Address:</strong> H NO 42 WARD NO 2, RANI DURGAWATI PARA, VILL SIRRI, TILDA, Raipur, Chhattisgarh, 492001 (State Code: 22)
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 pt-1 border-t border-emerald-200/80">
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <span className="text-slate-500 font-bold">Email:</span>
+                    <a href="mailto:thakuryograjj84@gmail.com" className="text-[#0d5c3a] hover:underline font-semibold">
+                      thakuryograjj84@gmail.com
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <span className="text-slate-500 font-bold">Call:</span>
+                    <a href="tel:+918224905073" className="text-[#0d5c3a] hover:underline font-semibold">
+                      +91 82249 05073
+                    </a>
+                  </div>
                 </div>
               </div>
 
               {/* Metadata Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[10px]">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Manufacturer</span>
-                  </div>
-                  <p className="font-bold text-slate-900 text-xs sm:text-sm">
-                    Thakur Yograj
-                  </p>
-                  <span className="text-[10px] text-emerald-700 font-semibold block">
-                    Raipur, Chhattisgarh
-                  </span>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
                   <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[10px]">
                     <FileCheck2 className="w-3.5 h-3.5 text-slate-400" />
                     <span>Batch Number</span>
@@ -186,33 +217,20 @@ export const VerifyProductLandingPage: React.FC = () => {
                     TY-2026-001
                   </p>
                   <span className="text-[10px] text-slate-500 block">
-                    Lot Size: 5,000 Bottles (250ml)
+                    Net / Gross Weight: 220 ml
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
                   <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[10px]">
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Manufacturing Date</span>
+                    <span>Manufacturing & Expiry</span>
                   </div>
                   <p className="font-bold text-slate-900 text-xs sm:text-sm">
-                    July 2026
-                  </p>
-                  <span className="text-[10px] text-slate-500 block">
-                    Expiry: June 2028 (24 Months)
-                  </span>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[10px]">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Active Standard</span>
-                  </div>
-                  <p className="font-bold text-emerald-800 text-xs sm:text-sm">
-                    100% Ayurvedic
+                    July 2026 to June 2028
                   </p>
                   <span className="text-[10px] text-emerald-700 font-semibold block">
-                    Chemical Free • Hairs Strengthening
+                    24 Months Shelf Life
                   </span>
                 </div>
 
