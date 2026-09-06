@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -10,210 +10,388 @@ import {
   Calendar,
   Building2,
   FileCheck2,
-  Cpu,
-  Fingerprint,
-  MapPin
+  Share2,
+  Search,
+  ExternalLink,
+  ChevronDown,
+  Globe,
+  Award,
+  FlaskConical,
+  Sprout,
+  FileText,
+  AlertTriangle,
+  Link as LinkIcon,
+  Phone,
+  Home
 } from 'lucide-react';
 import thakurYograjStudio from '@/assets/thakur-yograj-studio.jpg';
 
 export const VerifyProductLandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [currentDateTime, setCurrentDateTime] = useState<string>('02:09:35 AM, Sun, 06 Sept 2026');
+  const [copied, setCopied] = useState<boolean>(false);
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [showReportModal, setShowReportModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      const dateStr = now.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+      setCurrentDateTime(`${timeStr}, ${dateStr}`);
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleShare = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+    setShowShareModal(true);
+  };
 
   return (
-    <div className="min-h-screen w-full bg-[#faf9f5] text-slate-800 flex flex-col font-sans select-none relative overflow-x-hidden">
-      {/* Background Decorative Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
-
+    <div className="min-h-screen w-full bg-[#f4f7f5] text-slate-800 flex flex-col font-sans select-none relative overflow-x-hidden">
+      
       {/* ========================================================================= */}
-      {/* 1. TOP NAVBAR (AyuTrace Nexus)                                           */}
+      {/* 1. TOP HEADER & NAVBAR (Official Government Portal Look)                   */}
       {/* ========================================================================= */}
-      <header className="relative z-20 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 sm:px-12 py-3.5 flex items-center justify-between">
-        {/* Left: AyuTrace Nexus Logo & Digital Passport Badge */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#0d5c3a] text-white flex items-center justify-center shadow-sm">
-              <Leaf className="w-4.5 h-4.5" />
-            </div>
+      <header className="w-full bg-white border-b border-slate-200 px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4 z-30">
+        
+        {/* Left: State Emblem + Ministry of Ayush + AyuSetu Brand */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* Emblem of India */}
+          <div className="flex items-center gap-2.5 border-r border-slate-200 pr-4">
+            <svg
+              className="w-8 h-10 text-slate-900 shrink-0"
+              viewBox="0 0 100 120"
+              fill="currentColor"
+              aria-label="Emblem of India"
+            >
+              <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z M50 12 C55 12 58 18 58 25 C58 32 55 38 50 38 C45 38 42 32 42 25 C42 18 45 12 50 12 Z M35 70 C35 60 42 50 50 50 C58 50 65 60 65 70 C65 78 58 86 50 86 C42 86 35 78 35 70 Z" />
+              <circle cx="50" cy="98" r="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+              <rect x="25" y="110" width="50" height="3" rx="1.5" fill="currentColor" />
+            </svg>
             <div className="flex flex-col leading-tight">
-              <span className="text-base sm:text-lg font-black font-serif tracking-tight text-[#0d5c3a]">
-                AyuTrace Nexus
-              </span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
-                National Botanical Provenance Protocol
-              </span>
+              <span className="text-[11px] font-bold text-slate-900 font-serif">भारत सरकार</span>
+              <span className="text-xs font-bold tracking-tight text-slate-900 font-serif">Government of India</span>
+              <span className="text-[10px] text-slate-600 font-medium">आयुष मंत्रालय</span>
+              <span className="text-[10px] text-slate-500 font-medium">Ministry of Ayush</span>
             </div>
           </div>
 
-          <span className="hidden sm:inline-block px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-extrabold uppercase tracking-widest text-[#0d5c3a]">
-            BOTANICAL DIGITAL PASSPORT
-          </span>
+          {/* AyuSetu Logo */}
+          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="flex flex-col leading-none">
+              <span className="text-xl sm:text-2xl font-serif font-black text-[#0d5c3a] tracking-tight">
+                AyuSetu
+              </span>
+              <span className="text-[8px] sm:text-[9px] font-bold text-emerald-800 uppercase tracking-wider mt-0.5">
+                TRADITIONAL KNOWLEDGE FOR A HEALTHIER INDIA
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Right: Back to Main Website */}
-        <button
-          onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#0d5c3a] bg-slate-50 hover:bg-emerald-50/80 border border-slate-200 hover:border-emerald-200 px-4 py-2 rounded-xl transition-all shadow-2xs group cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back to Main Website</span>
-        </button>
+        {/* Center: Search Bar */}
+        <div className="flex-1 max-w-md hidden md:flex items-center">
+          <div className="w-full relative flex items-center">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search by Product / Batch ID / Manufacturer... उत्पाद / बैच आईडी / निर्माता से खोजें..."
+              className="w-full h-9 pl-9 pr-4 rounded-full bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1.5 focus:ring-[#0d5c3a] transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Right: Digital India, Viksit Bharat, Live Time, Language, Back Button */}
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          
+          {/* Digital India mark */}
+          <div className="hidden xl:flex items-center gap-1.5">
+            <div className="relative w-6 h-6 rounded-full border-2 border-[#FF9933] border-t-[#138808] border-r-[#000080] flex items-center justify-center transform -rotate-45">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-tr from-[#000080] via-[#FF9933] to-[#138808]" />
+            </div>
+            <div className="flex flex-col text-[8px] leading-tight font-bold text-slate-800">
+              <span>Digital India</span>
+              <span className="text-[7px] text-slate-500 font-normal">Power To Empower</span>
+            </div>
+          </div>
+
+          {/* Viksit Bharat @2047 */}
+          <div className="hidden lg:flex flex-col text-right leading-none border-l border-slate-200 pl-3">
+            <span className="text-[11px] font-black text-slate-800">Viksit</span>
+            <span className="text-[11px] font-bold text-slate-700">Bharat</span>
+            <span className="text-[9px] font-bold text-[#FF9933]">@2047</span>
+          </div>
+
+          {/* Live Date & Time */}
+          <div className="hidden sm:flex flex-col text-right leading-tight border-l border-slate-200 pl-3">
+            <span className="font-mono text-xs font-black text-slate-900">
+              {currentDateTime.split(',')[0]}
+            </span>
+            <span className="text-[10px] text-slate-500 font-medium">
+              {currentDateTime.split(',').slice(1).join(',')}
+            </span>
+          </div>
+
+          {/* Language Selector */}
+          <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-100">
+            <Globe className="w-3.5 h-3.5 text-slate-500" />
+            <span>English</span>
+            <ChevronDown className="w-3 h-3 text-slate-400" />
+          </div>
+
+          {/* Back to Main Website */}
+          <button
+            onClick={() => navigate('/')}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0d5c3a] bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Main Website</span>
+          </button>
+        </div>
+
       </header>
 
       {/* ========================================================================= */}
-      {/* 2. MAIN VERIFICATION SHOWCASE (Screen 1)                                 */}
+      {/* 2. SUB-BAR: BREADCRUMBS                                                   */}
       {/* ========================================================================= */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12 flex flex-col justify-center">
-        
-        {/* Header Title Section */}
-        <div className="text-center space-y-2 mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-300 text-[11px] font-bold text-[#0d5c3a] shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#0d5c3a]" />
-            <span>AUTHENTIC PRODUCT VERIFIED ON-CHAIN</span>
-          </div>
-          
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-black text-slate-900 tracking-tight">
-            Verify what's behind the label.
-          </h1>
+      <div className="w-full bg-[#0d5c3a] text-white text-xs px-4 sm:px-8 py-2 flex items-center gap-2 shadow-xs">
+        <button onClick={() => navigate('/')} className="hover:text-emerald-200 cursor-pointer">
+          <Home className="w-3.5 h-3.5" />
+        </button>
+        <span className="text-emerald-300/60">/</span>
+        <span className="text-emerald-100">Verify Product</span>
+        <span className="text-emerald-300/60">/</span>
+        <span className="text-white font-bold">Digital Product Passport</span>
+      </div>
 
-          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Trace the botanical ingredients of this Ayurvedic product from its recorded source to the final formulation.
-          </p>
+      {/* ========================================================================= */}
+      {/* 3. MAIN PORTAL BODY                                                       */}
+      {/* ========================================================================= */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-4">
+        
+        {/* Top Verified Blockchain Banner */}
+        <div className="w-full bg-gradient-to-r from-emerald-50/90 via-[#f0f9f4] to-emerald-50/70 border border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xs relative overflow-hidden">
+          
+          {/* Left: Verified on Blockchain Stamp */}
+          <div className="flex items-center gap-3.5 z-10">
+            <div className="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
+              <CheckCircle2 className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                Ayurvedic Product – Verified on National Blockchain
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-800 font-medium">
+                यह आयुर्वेदिक उत्पाद राष्ट्रीय ब्लॉकचेन पर सत्यापित है
+              </p>
+            </div>
+          </div>
+
+          {/* Right Quote & State Watermark */}
+          <div className="flex items-center gap-6 z-10 self-end md:self-auto">
+            <div className="text-right space-y-1">
+              <p className="text-xs sm:text-sm font-serif font-bold text-emerald-900 leading-tight">
+                &ldquo;प्रमाणित परंपरा, स्वस्थ भारत की ओर&rdquo;
+              </p>
+              <p className="text-[10px] text-slate-500 font-serif italic">
+                Verified Tradition, A Healthier India
+              </p>
+              <div className="flex items-center justify-end gap-0.5 pt-0.5">
+                <span className="w-4 h-0.5 bg-[#FF9933] rounded-full" />
+                <span className="w-4 h-0.5 bg-slate-300 rounded-full" />
+                <span className="w-4 h-0.5 bg-[#138808] rounded-full" />
+              </div>
+            </div>
+
+            {/* Emblem watermark representation */}
+            <div className="opacity-40 hidden sm:block">
+              <svg className="w-12 h-14 text-slate-800" viewBox="0 0 100 120" fill="currentColor">
+                <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z M50 12 C55 12 58 18 58 25 C58 32 55 38 50 38 C45 38 42 32 42 25 C42 18 45 12 50 12 Z M35 70 C35 60 42 50 50 50 C58 50 65 60 65 70 C65 78 58 86 50 86 C42 86 35 78 35 70 Z" />
+                <text x="50" y="118" textAnchor="middle" fontSize="7" fontWeight="bold">सत्यमेव जयते</text>
+              </svg>
+            </div>
+          </div>
+
         </div>
 
-        {/* 2-Column Product Showcase Card */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
+        {/* 3-Column Master Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           
-          {/* LEFT COLUMN: Physical Product Presentation & QR Scanning Visual (5 Cols) */}
-          <div className="lg:col-span-5 bg-gradient-to-b from-emerald-50/60 via-[#f5faf7] to-slate-50 p-6 sm:p-8 flex flex-col items-center justify-between border-b lg:border-b-0 lg:border-r border-slate-200/80 relative overflow-hidden">
+          {/* ===================================================================== */}
+          {/* COLUMN 1: PRODUCT IMAGE & AUTHENTICATION BADGES (3 Cols)              */}
+          {/* ===================================================================== */}
+          <div className="lg:col-span-3 space-y-3.5">
             
-            {/* Background decorative pulse */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-emerald-200/20 blur-2xl pointer-events-none" />
-
-            {/* Top Match Tag */}
-            <div className="w-full flex items-center justify-between z-10">
-              <span className="px-3 py-1 rounded-full bg-white border border-emerald-200 text-xs font-bold text-[#0d5c3a] flex items-center gap-1.5 shadow-2xs">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Physical Match Verified</span>
-              </span>
-              <span className="font-mono text-[10px] text-slate-400 font-bold">
-                ID: PX-82K9J
-              </span>
-            </div>
-
-            {/* Real Uploaded Ayurvedic Product Image */}
-            <div className="relative my-6 group w-full flex justify-center">
-              <div className="w-64 sm:w-72 md:w-80 max-w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-[#f6f1e8] flex items-center justify-center relative">
+            {/* Main Product Showcase Box */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col items-center relative overflow-hidden">
+              
+              <div className="w-full aspect-square rounded-xl overflow-hidden bg-[#f6f1e8] flex items-center justify-center relative border border-slate-100">
                 <img
                   src={thakurYograjStudio}
-                  alt="Thakur Yograj Herbal Hair Oil - Real Physical Ayurvedic Product"
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+                  alt="Thakur Yograj Herbal Hair Oil Product Box and Bottle"
+                  className="w-full h-full object-cover object-center"
                 />
 
-                {/* Laser Scanning Effect Line */}
-                <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#10b981] animate-[bounce_3s_ease-in-out_infinite] pointer-events-none" />
+                {/* Laser Scanning Line */}
+                <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_10px_#10b981] animate-[bounce_3s_ease-in-out_infinite] pointer-events-none" />
               </div>
+
             </div>
 
-            {/* Bottom Cryptographic Stamp */}
-            <div className="w-full bg-white/90 backdrop-blur-sm p-3 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs z-10 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <QrCode className="w-4 h-4 text-[#0d5c3a]" />
-                <div className="flex flex-col">
-                  <span className="font-bold text-slate-800 text-[11px]">QR Pass Hash</span>
-                  <span className="font-mono text-[9px] text-slate-500">0x8a92f1b4...491c</span>
+            {/* Scan QR to View Card */}
+            <div className="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0">
+                  <QrCode className="w-6 h-6 text-[#0d5c3a]" />
+                </div>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-xs font-bold text-slate-900">Scan QR to view</span>
+                  <span className="text-[11px] font-bold text-[#0d5c3a]">on AyuSetu</span>
+                  <span className="text-[9px] text-slate-500 font-medium">सत्यापन के लिए QR स्कैन करें</span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-[10px] font-bold text-emerald-700">
-                100% Tamper-Proof
-              </span>
+
+              <button
+                onClick={handleShare}
+                title="Share Verification Link"
+                className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 flex items-center justify-center text-slate-600 hover:text-[#0d5c3a] transition-all cursor-pointer"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 100% Authentic Guaranteed Card */}
+            <div className="bg-gradient-to-r from-[#0d5c3a]/10 via-[#0d5c3a]/5 to-transparent rounded-2xl p-3.5 border border-emerald-200/90 shadow-xs flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#0d5c3a] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <CheckCircle2 className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <span className="text-xs font-black text-slate-900 block leading-tight">
+                  100% Authentic
+                </span>
+                <span className="text-[10px] font-bold text-[#0d5c3a]">
+                  पूर्णतः प्रामाणिक
+                </span>
+              </div>
             </div>
 
           </div>
 
-          {/* RIGHT COLUMN: Product Verification Details & Primary CTA (7 Cols) */}
-          <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
+          {/* ===================================================================== */}
+          {/* COLUMN 2: DETAILED PRODUCT, MANUFACTURER & SPECS (6 Cols)            */}
+          {/* ===================================================================== */}
+          <div className="lg:col-span-6 space-y-3.5">
             
-            <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs space-y-4">
               
-              {/* Top Status Banner */}
-              <div className="flex items-center justify-between flex-wrap gap-2 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-sm font-black tracking-wide text-emerald-800 uppercase">
-                    ✓ VERIFIED PRODUCT
-                  </span>
-                </div>
-
-                <span className="text-xs font-mono font-bold text-slate-500">
-                  National Database Sync: Active
+              {/* Top Verified Header Pill */}
+              <div className="flex items-center justify-between flex-wrap gap-2 pb-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#0d5c3a] text-white text-[11px] font-bold tracking-wide shadow-xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>VERIFIED PRODUCT | सत्यापित उत्पाद</span>
                 </span>
+
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+                  <span className="text-[11px]">National Database Sync:</span>
+                  <span className="text-emerald-700 font-bold">Active</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
               </div>
 
-              {/* Product Title & Botanical Taxon */}
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Brand:</span>
-                  <span className="text-xs font-black text-[#0d5c3a] uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    Thakur Yograj
-                  </span>
-                  <span className="text-xs text-slate-400">•</span>
-                  <span className="text-xs font-bold text-slate-600">Ayurvedic Hair Care Products</span>
-                </div>
-                
+              {/* Brand & Product Title */}
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  BRAND / ब्रांड
+                </span>
                 <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
-                  Hair Oil
+                  THAKUR YOGRAJ
                 </h2>
-                
-                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-emerald-800 font-serif italic font-semibold">
-                  <span>Pure Herbal Extracts Formulation</span>
-                  <span>•</span>
-                  <span>Net Vol: <strong className="font-mono not-italic text-slate-800">220 ml</strong></span>
-                  <span>•</span>
-                  <span>Origin: <strong className="not-italic text-slate-800">India</strong></span>
+                <div className="text-sm sm:text-base font-bold text-[#0d5c3a]">
+                  Hair Oil / <span className="font-medium">हेयर ऑयल</span>
                 </div>
+                <p className="text-xs text-slate-600 pt-0.5">
+                  Pure Herbal Extracts Formulation <span className="text-slate-300">|</span> <span className="text-slate-500">शुद्ध हर्बल अर्क आधारित सूत्रण</span>
+                </p>
               </div>
 
-              {/* Manufacturer Official Profile Box */}
-              <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-[#0d5c3a] font-black uppercase text-[11px]">
-                    <Building2 className="w-4 h-4 text-[#0d5c3a]" />
-                    <span>Manufacturer: Thakur Yograj</span>
+              {/* 3 Quick Product Badges */}
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2">
+                  <span className="text-base">🧴</span>
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Net Volume</span>
+                    <strong className="text-slate-900 text-xs">220 ml</strong>
                   </div>
-                  <span className="font-mono text-[10px] font-black bg-white px-2 py-0.5 rounded border border-emerald-300 text-[#0d5c3a]">
-                    GSTIN: 22MHJPS4647F1ZX
-                  </span>
                 </div>
 
-                <p className="text-xs text-slate-700 leading-snug font-medium">
-                  <strong>Address:</strong> H NO 42 WARD NO 2, RANI DURGAWATI PARA, VILL SIRRI, TILDA, Raipur, Chhattisgarh, 492001 (State Code: 22)
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2">
+                  <span className="text-base">🇮🇳</span>
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Origin</span>
+                    <strong className="text-slate-900 text-xs">India</strong>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-2">
+                  <span className="text-base">🌿</span>
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Category</span>
+                    <strong className="text-slate-900 text-xs leading-none block">Ayurvedic Hair Care</strong>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Manufacturer Information Box */}
+              <div className="p-3.5 sm:p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/90 space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1 border-b border-emerald-200/60">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-[#0d5c3a] text-white flex items-center justify-center">
+                      <Building2 className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-bold uppercase text-slate-500 block">MANUFACTURER / निर्माता</span>
+                      <strong className="text-slate-900 text-xs sm:text-sm">THAKUR YOGRAJ</strong>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] font-mono font-bold text-[#0d5c3a]">
+                    GSTIN: <span className="bg-white px-1.5 py-0.5 rounded border border-emerald-300">22MHJPS4647F1ZX</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-700 leading-relaxed">
+                  H NO 42 WARD NO 2, RANI DURGAWATI PARA, VILL SIRRI, TILDA, Raipur, Chhattisgarh, 492001 (State Code: 22)
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 pt-1 border-t border-emerald-200/80">
-                  <div className="flex items-center gap-1.5 font-medium">
-                    <span className="text-slate-500 font-bold">Email:</span>
-                    <a href="mailto:thakuryograjj84@gmail.com" className="text-[#0d5c3a] hover:underline font-semibold">
-                      thakuryograjj84@gmail.com
-                    </a>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-700 pt-1 border-t border-emerald-200/60">
+                  <div>
+                    <span className="text-slate-500 font-bold">Email:</span> <a href="mailto:thakuryograjj84@gmail.com" className="text-[#0d5c3a] font-semibold hover:underline">thakuryograjj84@gmail.com</a>
                   </div>
-                  <div className="flex items-center gap-1.5 font-medium">
-                    <span className="text-slate-500 font-bold">Call:</span>
-                    <a href="tel:+918224905073" className="text-[#0d5c3a] hover:underline font-semibold">
-                      +91 82249 05073
-                    </a>
+                  <div>
+                    <span className="text-slate-500 font-bold">Contact:</span> <a href="tel:+918224905073" className="text-[#0d5c3a] font-semibold hover:underline">+91 82249 05073</a>
                   </div>
                 </div>
               </div>
 
-              {/* Metadata Grid */}
+              {/* Batch & Dates (2-grid) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[10px]">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[9px]">
                     <FileCheck2 className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Batch Number</span>
+                    <span>BATCH NUMBER / बैच संख्या</span>
                   </div>
-                  <p className="font-mono font-black text-slate-900 text-xs sm:text-sm">
+                  <p className="font-mono font-black text-slate-900 text-sm">
                     TY-2026-001
                   </p>
                   <span className="text-[10px] text-slate-500 block">
@@ -221,65 +399,226 @@ export const VerifyProductLandingPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[10px]">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <div className="flex items-center gap-1.5 text-slate-500 font-bold uppercase text-[9px]">
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Manufacturing & Expiry</span>
+                    <span>MANUFACTURING & EXPIRY / निर्माण और समाप्ति</span>
                   </div>
-                  <p className="font-bold text-slate-900 text-xs sm:text-sm">
+                  <p className="font-bold text-slate-900 text-sm">
                     July 2026 to June 2028
                   </p>
-                  <span className="text-[10px] text-emerald-700 font-semibold block">
-                    24 Months Shelf Life
+                  <span className="text-[10px] text-slate-500 block">
+                    24 Months Shelf Life / 24 माह की शेल्फ लाइफ
                   </span>
                 </div>
 
               </div>
 
-              {/* Verification Badges summary */}
-              <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-800 block">
-                  DIGITAL CERTIFICATE CONFIRMATIONS
+              {/* Certification & Compliance */}
+              <div className="space-y-2 pt-1 border-t border-slate-100">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                  CERTIFICATION & COMPLIANCE / प्रमाणन एवं अनुपालन
                 </span>
-                <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-800">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Authentic Botanical Identity</span>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                  
+                  <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 mb-0.5" />
+                    <strong className="text-slate-900 text-[10px]">GMP</strong>
+                    <span className="text-[9px] text-emerald-800">Certified</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Geo-fenced Origin Traced</span>
+
+                  <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col items-center justify-center">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 mb-0.5" />
+                    <strong className="text-slate-900 text-[10px]">AYUSH</strong>
+                    <span className="text-[9px] text-emerald-800">Compliant</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Lab Safety & Purity Tested</span>
+
+                  <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col items-center justify-center">
+                    <FlaskConical className="w-4 h-4 text-emerald-600 mb-0.5" />
+                    <strong className="text-slate-900 text-[10px]">Lab Tested</strong>
+                    <span className="text-[9px] text-emerald-800">for Safety</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Tamper-evident Chain of Custody</span>
+
+                  <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col items-center justify-center">
+                    <Sprout className="w-4 h-4 text-emerald-600 mb-0.5" />
+                    <strong className="text-slate-900 text-[10px]">Natural Ingredients</strong>
+                    <span className="text-[9px] text-emerald-800">Verified</span>
                   </div>
+
                 </div>
               </div>
 
             </div>
 
-            {/* Primary Action Button */}
-            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+          </div>
+
+          {/* ===================================================================== */}
+          {/* COLUMN 3: BLOCKCHAIN PROOF & JOURNEY TIMELINE (3 Cols)                */}
+          {/* ===================================================================== */}
+          <div className="lg:col-span-3 space-y-3.5">
+            
+            {/* Blockchain Verification Card */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <LinkIcon className="w-4 h-4 text-[#0d5c3a]" />
+                <h3 className="font-bold text-slate-900 text-xs sm:text-sm">
+                  Blockchain Verification
+                </h3>
+              </div>
+
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 font-sans font-medium text-[11px]">Product ID</span>
+                  <strong className="text-slate-800">PX-82K9J</strong>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 font-sans font-medium text-[11px]">Transaction Hash</span>
+                  <span className="text-[#0d5c3a] font-bold">0x9f4c...a7d2</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 font-sans font-medium text-[11px]">Block Number</span>
+                  <span className="text-slate-800">#4589123</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 font-sans font-medium text-[11px]">Verified On</span>
+                  <span className="text-slate-700 text-[10px]">06 Sept 2026, 01:45 PM</span>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between font-sans">
+                  <span className="text-slate-500 font-medium text-[11px]">Status</span>
+                  <div className="text-right">
+                    <span className="text-emerald-700 font-bold text-xs flex items-center gap-1 justify-end">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Valid & Untampered
+                    </span>
+                    <span className="text-[10px] text-slate-400 block">मान्य और अपरिवर्तित</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Journey to You Timeline Card */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <ShieldCheck className="w-4 h-4 text-[#0d5c3a]" />
+                <h3 className="font-bold text-slate-900 text-xs sm:text-sm">
+                  Journey to You / <span className="font-medium text-[11px] text-slate-600">आप तक की यात्रा</span>
+                </h3>
+              </div>
+
+              {/* Vertical Stepper */}
+              <div className="space-y-3 text-xs relative pl-1">
+                
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 flex items-start justify-between leading-tight">
+                    <div>
+                      <strong className="text-slate-800 block text-[11px]">Raw Material Sourced</strong>
+                      <span className="text-[9px] text-slate-500">कच्चा माल स्रोत</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-700 font-bold block">Jan 2026</span>
+                      <span className="text-[9px] text-slate-500">Chhattisgarh</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 flex items-start justify-between leading-tight">
+                    <div>
+                      <strong className="text-slate-800 block text-[11px]">Manufactured</strong>
+                      <span className="text-[9px] text-slate-500">निर्माण</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-700 font-bold block">Jul 2026</span>
+                      <span className="text-[9px] text-slate-500">Raipur</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 flex items-start justify-between leading-tight">
+                    <div>
+                      <strong className="text-slate-800 block text-[11px]">Quality Tested</strong>
+                      <span className="text-[9px] text-slate-500">गुणवत्ता परीक्षण</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-700 font-bold block">Jul 2026</span>
+                      <span className="text-[9px] text-slate-500">Govt. Lab</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 flex items-start justify-between leading-tight">
+                    <div>
+                      <strong className="text-slate-800 block text-[11px]">Listed on Blockchain</strong>
+                      <span className="text-[9px] text-slate-500">ब्लॉकचेन पर सूचीबद्ध</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-700 font-bold block">Aug 2026</span>
+                      <span className="text-[9px] text-slate-500">AyuSetu</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 flex items-start justify-between leading-tight">
+                    <div>
+                      <strong className="text-slate-800 block text-[11px]">Available for Consumers</strong>
+                      <span className="text-[9px] text-slate-500">उपभोक्ताओं के लिए उपलब्ध</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-700 font-bold block">Sep 2026</span>
+                      <span className="text-[9px] text-slate-500">India</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="space-y-2">
               <button
-                id="view-digital-passport-btn"
+                id="view-complete-traceability-btn"
                 onClick={() => navigate('/verify-product/passport')}
-                className="w-full sm:w-auto flex-1 h-14 rounded-2xl bg-[#0d5c3a] hover:bg-[#09462b] text-white font-bold text-base shadow-lg shadow-emerald-900/20 hover:shadow-xl hover:shadow-emerald-900/30 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer group"
+                className="w-full h-12 rounded-xl bg-[#0d5c3a] hover:bg-[#09462b] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-between px-4 cursor-pointer group"
               >
-                <span>View Digital Passport</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-emerald-200" />
+                  <div className="text-left leading-tight">
+                    <span className="block font-bold">View Complete Traceability Details</span>
+                    <span className="text-[9px] text-emerald-200 font-normal">पूर्ण ट्रेसेबिलिटी विवरण देखें</span>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <button
-                onClick={() => navigate('/verify-product/passport')}
-                className="w-full sm:w-auto px-6 h-14 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                onClick={() => setShowReportModal(true)}
+                className="w-full h-9 rounded-xl bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <Cpu className="w-4 h-4 text-emerald-700" />
-                <span>Anti-Counterfeit Demo</span>
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                <span>Report An Issue / समस्या की रिपोर्ट करें</span>
               </button>
             </div>
 
@@ -290,14 +629,95 @@ export const VerifyProductLandingPage: React.FC = () => {
       </main>
 
       {/* ========================================================================= */}
-      {/* 3. FOOTER                                                                */}
+      {/* 4. FOOTER                                                                */}
       {/* ========================================================================= */}
-      <footer className="relative z-10 w-full bg-white border-t border-slate-200/90 py-4 px-6 text-center text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>AyuTrace Nexus • Ministry of Ayush Consumer Verification Prototype</span>
-          <span className="font-mono text-[10px]">Permissioned On-Chain Ledger Protocol</span>
+      <footer className="w-full bg-white border-t border-slate-200/90 py-4 px-4 sm:px-8 mt-8 text-xs text-slate-600">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-6 text-slate-700" viewBox="0 0 100 120" fill="currentColor">
+              <path d="M50 5 C40 5 35 15 35 25 C35 32 38 38 42 42 C30 45 20 55 20 70 C20 78 25 85 32 90 L32 96 C30 98 25 100 20 102 L20 106 L80 106 L80 102 C75 100 70 98 68 96 L68 90 C75 85 80 78 80 70 C80 55 70 45 58 42 C62 38 65 32 65 25 C65 15 60 5 50 5 Z" />
+            </svg>
+            <div>
+              <span className="font-bold text-slate-900 block leading-tight">Ministry of Ayush</span>
+              <span className="text-[10px] text-slate-500">Government of India</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 text-[11px] text-slate-500">
+            <a href="#" className="hover:text-emerald-700">Terms of Use</a>
+            <span>|</span>
+            <a href="#" className="hover:text-emerald-700">Privacy Policy</a>
+            <span>|</span>
+            <a href="#" className="hover:text-emerald-700">Help & Support</a>
+          </div>
+
+          <div className="flex items-center gap-6 text-[11px]">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+              <Phone className="w-3.5 h-3.5 text-[#0d5c3a]" />
+              <div>
+                <span>1800-120-8040</span>
+                <span className="text-[9px] text-slate-400 block leading-none">(Toll Free)</span>
+              </div>
+            </div>
+
+            <a href="https://www.ayush.gov.in" target="_blank" rel="noreferrer" className="text-slate-700 hover:text-emerald-700 flex items-center gap-1">
+              <Globe className="w-3.5 h-3.5 text-slate-400" />
+              <span>www.ayush.gov.in</span>
+            </a>
+
+            <div className="hidden lg:flex items-center gap-1.5 text-[#0d5c3a] font-bold">
+              <Leaf className="w-3.5 h-3.5" />
+              <div>
+                <span>Ayurveda for All</span>
+                <span className="text-[9px] text-emerald-800 block leading-none">स्वस्थ भारत, सशक्त भारत</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </footer>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-4">
+            <h3 className="text-sm font-bold text-slate-900">Share Product Verification</h3>
+            <p className="text-xs text-slate-600">
+              Link has been copied to your clipboard! You can share this URL with any consumer or regulator to verify the Thakur Yograj Hair Oil provenance on-chain.
+            </p>
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full h-10 rounded-xl bg-[#0d5c3a] text-white text-xs font-bold"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-4">
+            <h3 className="text-sm font-bold text-slate-900">National Anti-Counterfeit Cell</h3>
+            <p className="text-xs text-slate-600">
+              To report discrepancies regarding Batch TY-2026-001 or suspect packaging, submit details to the AYUSH National Verification Authority.
+            </p>
+            <div className="p-3 bg-slate-50 rounded-xl border text-xs font-mono">
+              Hotline: 1800-120-8040 (Toll Free)
+              Email: grievance@ayush.gov.in
+            </div>
+            <button
+              onClick={() => setShowReportModal(false)}
+              className="w-full h-10 rounded-xl bg-[#0d5c3a] text-white text-xs font-bold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
