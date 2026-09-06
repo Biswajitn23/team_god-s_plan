@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   Leaf,
   CheckCircle2,
-  Award,
   Calendar,
   Building2,
   FileCheck2,
@@ -15,7 +14,7 @@ import {
   Fingerprint,
   MapPin
 } from 'lucide-react';
-import ashwagandhaProduct from '@/assets/ashwagandha-product.jpg';
+import thakurYograjProduct from '@/assets/thakur-yograj-1.png';
 
 export const VerifyProductLandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -105,19 +104,13 @@ export const VerifyProductLandingPage: React.FC = () => {
             <div className="relative my-6 group">
               <div className="w-56 sm:w-64 h-72 sm:h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-white flex items-center justify-center relative">
                 <img
-                  src={ashwagandhaProduct}
-                  alt="Ashwagandha Formulation - Real Physical Ayurvedic Product"
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+                  src={thakurYograjProduct}
+                  alt="Thakur Yograj Herbal Hair Oil - Real Physical Ayurvedic Product"
+                  className="w-full h-full object-contain p-2 transform group-hover:scale-105 transition-transform duration-500"
                 />
 
                 {/* Laser Scanning Effect Line */}
                 <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#10b981] animate-[bounce_3s_ease-in-out_infinite] pointer-events-none" />
-              </div>
-
-              {/* Verified Hologram Seal */}
-              <div className="absolute -bottom-3 -right-3 bg-gradient-to-tr from-[#0d5c3a] to-emerald-600 text-white p-2.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-1.5">
-                <Award className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-wider">AYUSH GMP</span>
               </div>
             </div>
 

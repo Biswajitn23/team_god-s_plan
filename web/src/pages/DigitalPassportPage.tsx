@@ -29,7 +29,7 @@ import {
   Activity,
   Award
 } from 'lucide-react';
-import ashwagandhaProduct from '@/assets/ashwagandha-product.jpg';
+import thakurYograjProduct from '@/assets/thakur-yograj-1.png';
 
 export const DigitalPassportPage: React.FC = () => {
   const navigate = useNavigate();
