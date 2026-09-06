@@ -453,6 +453,10 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
                       key={sampleId}
                       type="button"
                       onClick={() => {
+                        onChangeCredential('aggregatorId', '');
+                        onChangeCredential('organizationId', '');
+                        onChangeCredential('companyId', '');
+                        onChangeCredential('distributorId', '');
                         onChangeCredential(currentRole.idField, sampleId);
                         onChangeCredential('password', 'password123');
                       }}

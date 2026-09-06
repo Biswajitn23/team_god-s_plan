@@ -255,8 +255,33 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
     ]
   };
 
+  const getRoleIdField = (role: string): keyof CredentialsState => {
+    switch (role) {
+      case 'aggregator': return 'aggregatorId';
+      case 'processor': return 'organizationId';
+      case 'manufacturer': return 'companyId';
+      case 'distributor': return 'distributorId';
+      case 'farmer': return 'aggregatorId';
+      default: return 'aggregatorId';
+    }
+  };
+
+  const getCurrentRoleId = (role: string, creds: CredentialsState): string => {
+    const field = getRoleIdField(role);
+    return (creds[field] as string) || '';
+  };
+
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
+    // Reset all role ID fields and passwords to prevent cross-role ID pollution
+    setCredentials(prev => ({
+      ...prev,
+      aggregatorId: '',
+      organizationId: '',
+      companyId: '',
+      distributorId: '',
+      password: ''
+    }));
     setStep('credentials-entry');
   };
 
@@ -360,15 +385,32 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
     }
 
     if (selectedRole !== 'farmer') {
-      const inputId = credentials.aggregatorId || credentials.organizationId || credentials.companyId || credentials.distributorId;
-      const expectedUsers = mockDatabase[selectedRole] || [];
-      const matchedUser = expectedUsers.find(u => u.id === inputId);
+      const field = getRoleIdField(selectedRole);
+      const inputId = ((credentials[field] as string) || '').trim().toUpperCase();
 
-      if (!matchedUser) {
-        toast({ title: "Account Not Found", description: `The ID '${inputId || ''}' does not exist in our database.`, variant: "destructive" });
+      if (!inputId) {
+        toast({ title: "Input Required", description: `Please enter your ${getRoleConfig(selectedRole)?.label || 'account'} ID.`, variant: "destructive" });
         return false;
       }
-      if (credentials.password !== matchedUser.password) {
+
+      const expectedUsers = mockDatabase[selectedRole] || [];
+      const matchedUser = expectedUsers.find(u => u.id.toUpperCase() === inputId);
+
+      // Validate official format prefix (e.g. AGG-*, PROC-*, MFG-*, DIST-*)
+      const rolePrefixMap: Record<string, string> = {
+        'aggregator': 'AGG',
+        'processor': 'PROC',
+        'manufacturer': 'MFG',
+        'distributor': 'DIST'
+      };
+      const validPrefix = rolePrefixMap[selectedRole];
+      const isValidFormat = validPrefix && (inputId.startsWith(`${validPrefix}-`) || inputId.includes('@'));
+
+      if (!matchedUser && !isValidFormat) {
+        toast({ title: "Account Not Found", description: `The ID '${inputId}' does not exist in our database.`, variant: "destructive" });
+        return false;
+      }
+      if (matchedUser && credentials.password && credentials.password !== matchedUser.password) {
         toast({ title: "Incorrect Password", description: "The password you entered is incorrect.", variant: "destructive" });
         return false;
       }
@@ -388,8 +430,8 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
         if (needsOtp) {
           setStep('otp-verification');
         } else {
-          // Mock direct login for non-OTP flows
-          onLogin(selectedRole, credentials.aggregatorId || credentials.organizationId || credentials.distributorId || 'MOCK_ID');
+          // Direct login for non-OTP flows
+          onLogin(selectedRole, getCurrentRoleId(selectedRole, credentials) || 'MOCK_ID');
         }
       }, 800);
     }
@@ -433,7 +475,7 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
       } else {
         setTimeout(() => {
           setIsFinalizing(false);
-          onLogin(selectedRole, credentials.aggregatorId || credentials.organizationId || credentials.distributorId || 'MOCK_ID');
+          onLogin(selectedRole, getCurrentRoleId(selectedRole, credentials) || 'MOCK_ID');
         }, 1000);
       }
     } else {
