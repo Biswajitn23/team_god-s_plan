@@ -659,26 +659,28 @@ const AuthComponent = ({ onLogin }: AuthComponentProps) => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
           </div>
 
-          {/* Top Logo Section */}
-          <div className="relative z-10 flex items-center gap-3">
-            <button
-              onClick={() => setStep('role-selection')}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white/90 text-xs font-medium transition-all mb-3 border border-white/15"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Roles</span>
-            </button>
-          </div>
-
-          <div className="relative z-10 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-[#3c4a3e]/80 backdrop-blur-md border border-white/20 flex items-center justify-center p-2 shadow-xl">
-              <img src={ayusetuEmblem} alt="AyuSetu Emblem" className="w-full h-full object-contain" />
-            </div>
+          {/* Top-Left Section: Back Button + AyuSetu Branding */}
+          <div className="relative z-10 space-y-3.5">
             <div>
-              <h1 className="text-3xl font-bold text-white tracking-tight font-serif">AyuSetu</h1>
-              <p className="text-white/90 text-sm font-medium">
-                Trusted Herbal Supply Chain for Bharat
-              </p>
+              <button
+                onClick={() => setStep('role-selection')}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-md text-white text-xs font-semibold transition-all border border-white/20 shadow-sm cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Roles</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <div className="w-12 h-12 rounded-full bg-[#3c4a3e]/85 backdrop-blur-md border border-white/25 flex items-center justify-center p-2 shadow-xl shrink-0">
+                <img src={ayusetuEmblem} alt="AyuSetu Emblem" className="w-full h-full object-contain" />
+              </div>
+              <div className="leading-tight">
+                <h1 className="text-3xl font-bold text-white tracking-tight font-serif drop-shadow-md">AyuSetu</h1>
+                <p className="text-white/90 text-xs sm:text-sm font-medium drop-shadow-md">
+                  Trusted Herbal Supply Chain for Bharat
+                </p>
+              </div>
             </div>
           </div>
 

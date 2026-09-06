@@ -37,13 +37,44 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
   const [rememberMe, setRememberMe] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'hi'>('en');
 
-  // Role metadata mapping
+  // Helper function to format ID according to role schema (e.g. AGG-1001, PROC-2001)
+  const formatRoleId = (input: string, prefix: string): string => {
+    if (!input) return '';
+    const upper = input.toUpperCase();
+    const cleaned = upper.replace(/[^A-Z0-9]/g, '');
+
+    // If only digits are typed, auto-prefix with role tag: e.g. "1001" -> "AGG-1001"
+    if (/^\d+$/.test(cleaned)) {
+      return `${prefix}-${cleaned}`;
+    }
+
+    // If input already has letters followed by digits: e.g. "AGG1001" -> "AGG-1001"
+    if (/^([A-Z]+)(\d+.*)$/.test(cleaned)) {
+      return cleaned.replace(/^([A-Z]+)(\d+)/, '$1-$2');
+    }
+
+    return upper;
+  };
+
+  const handleIdInputChange = (field: string, rawVal: string, prefix: string) => {
+    if (!rawVal) {
+      onChangeCredential(field, '');
+      return;
+    }
+    const formatted = formatRoleId(rawVal, prefix);
+    onChangeCredential(field, formatted);
+  };
+
+  // Role metadata mapping with strict official ID formats
   const roleConfigMap: Record<string, {
     title: string;
     description: string;
     idField: string;
     idLabel: string;
     idPlaceholder: string;
+    prefix: string;
+    format: string;
+    sampleIds: string[];
     iconBg: string;
     iconColor: string;
     icon: string;
@@ -53,7 +84,10 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
       description: 'Manage collection and consolidation of Ayurvedic herbs from verified sources',
       idField: 'aggregatorId',
       idLabel: 'Aggregator ID',
-      idPlaceholder: 'Enter your Aggregator ID (e.g. AGG-1001)',
+      idPlaceholder: 'e.g. AGG-1001',
+      prefix: 'AGG',
+      format: 'AGG-XXXX',
+      sampleIds: ['AGG-1001', 'AGG-1002', 'AGG-1003'],
       iconBg: 'bg-amber-100',
       iconColor: 'text-amber-800',
       icon: '📦'
@@ -63,7 +97,10 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
       description: 'Refine herbal extractions, standardize quality, and record pharmacopoeia testing',
       idField: 'organizationId',
       idLabel: 'Processor / Organization ID',
-      idPlaceholder: 'Enter your Organization ID (e.g. PROC-2001)',
+      idPlaceholder: 'e.g. PROC-2001',
+      prefix: 'PROC',
+      format: 'PROC-XXXX',
+      sampleIds: ['PROC-2001', 'PROC-2002', 'PROC-2003'],
       iconBg: 'bg-sky-100',
       iconColor: 'text-sky-800',
       icon: '⚙️'
@@ -73,7 +110,10 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
       description: 'Oversee GMP product formulation, batch QR serialization, and tamper verification',
       idField: 'companyId',
       idLabel: 'Company / License ID',
-      idPlaceholder: 'Enter your Company ID (e.g. MFG-3001)',
+      idPlaceholder: 'e.g. MFG-3001',
+      prefix: 'MFG',
+      format: 'MFG-XXXX',
+      sampleIds: ['MFG-3001', 'MFG-3002', 'MFG-3003'],
       iconBg: 'bg-rose-100',
       iconColor: 'text-rose-800',
       icon: '🏭'
@@ -83,7 +123,10 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
       description: 'Coordinate GPS-tracked logistics, e-Waybills, and distribution to Vaidyas & pharmacies',
       idField: 'distributorId',
       idLabel: 'Distributor ID',
-      idPlaceholder: 'Enter your Distributor ID (e.g. DIST-4001)',
+      idPlaceholder: 'e.g. DIST-4001',
+      prefix: 'DIST',
+      format: 'DIST-XXXX',
+      sampleIds: ['DIST-4001', 'DIST-4002', 'DIST-4003'],
       iconBg: 'bg-violet-100',
       iconColor: 'text-violet-800',
       icon: '🚚'
@@ -94,6 +137,9 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
       idField: 'mobile',
       idLabel: 'Mobile Number',
       idPlaceholder: 'Enter 10-digit mobile number',
+      prefix: 'FARM',
+      format: 'FARM-XXXX',
+      sampleIds: ['FARM-001', 'FARM-002', 'FARM-003', 'FARM-004'],
       iconBg: 'bg-emerald-100',
       iconColor: 'text-emerald-800',
       icon: '🌿'
@@ -375,11 +421,17 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
           {/* ------------------------------------------------------------------- */}
           {selectedRole !== 'farmer' ? (
             <div className="space-y-4">
-              {/* ID Input Field */}
+              {/* ID Input Field with Format Badge and Auto-Hyphenation */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-700">
-                  {currentRole.idLabel}
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-700">
+                    {currentRole.idLabel}
+                  </label>
+                  <span className="text-[10px] font-mono font-bold text-[#0d5c3a] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                    Format: {currentRole.format}
+                  </span>
+                </div>
+
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <User className="w-4 h-4" />
@@ -387,13 +439,32 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
                   <input
                     type="text"
                     value={credentials[currentRole.idField] || ''}
-                    onChange={(e) => onChangeCredential(currentRole.idField, e.target.value.toUpperCase())}
+                    onChange={(e) => handleIdInputChange(currentRole.idField, e.target.value, currentRole.prefix)}
                     placeholder={currentRole.idPlaceholder}
-                    className="w-full h-12 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0d5c3a]/20 focus:border-[#0d5c3a] transition-all shadow-sm"
+                    className="w-full h-12 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-sm font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0d5c3a]/20 focus:border-[#0d5c3a] transition-all shadow-sm uppercase tracking-wide"
                   />
                 </div>
+
+                {/* Quick Demo ID Fill Chips */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <span className="text-[10px] font-semibold text-slate-400">Quick Fill:</span>
+                  {currentRole.sampleIds.map((sampleId) => (
+                    <button
+                      key={sampleId}
+                      type="button"
+                      onClick={() => {
+                        onChangeCredential(currentRole.idField, sampleId);
+                        onChangeCredential('password', 'password123');
+                      }}
+                      className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-100 border border-slate-200 hover:border-emerald-300 text-[10px] font-mono font-bold text-slate-700 hover:text-[#0d5c3a] transition-all cursor-pointer"
+                    >
+                      {sampleId}
+                    </button>
+                  ))}
+                </div>
+
                 <p className="text-[10px] text-slate-500 font-medium pl-1">
-                  Provided by State Ayush Department
+                  Official format: <code className="font-mono font-bold text-emerald-800">{currentRole.format}</code> (Provided by State Ayush Department)
                 </p>
               </div>
 
@@ -601,16 +672,38 @@ export const RoleLoginScreen: React.FC<RoleLoginScreenProps> = ({
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Enter Identity Access PIN</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-700">Enter Identity Access PIN</label>
+                      <span className="text-[10px] font-mono font-bold text-[#0d5c3a] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                        Format: FARM-XXXX
+                      </span>
+                    </div>
+
                     <input
                       type="text"
-                      placeholder="e.g. FARM-1001"
+                      placeholder="e.g. FARM-001 or FARM-1001"
                       value={credentials.aggregatorId || ''}
-                      onChange={(e) => onChangeCredential('aggregatorId', e.target.value.toUpperCase())}
-                      className="w-full h-12 px-4 rounded-xl border border-slate-200 font-mono font-bold text-slate-800 text-base focus:ring-2 focus:ring-[#0d5c3a]/20 focus:border-[#0d5c3a] outline-none"
+                      onChange={(e) => handleIdInputChange('aggregatorId', e.target.value, 'FARM')}
+                      className="w-full h-12 px-4 rounded-xl border border-slate-200 font-mono font-bold text-slate-800 text-base focus:ring-2 focus:ring-[#0d5c3a]/20 focus:border-[#0d5c3a] outline-none uppercase tracking-wide"
                     />
+
+                    {/* Quick Demo Farmer ID Chips */}
+                    <div className="flex items-center gap-1.5 flex-wrap pt-1.5">
+                      <span className="text-[10px] font-semibold text-slate-400">Sample Profiles:</span>
+                      {['FARM-001', 'FARM-002', 'FARM-003', 'FARM-004'].map((pin) => (
+                        <button
+                          key={pin}
+                          type="button"
+                          onClick={() => onChangeCredential('aggregatorId', pin)}
+                          className="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[10px] font-mono font-bold text-emerald-800 transition-all cursor-pointer"
+                        >
+                          {pin}
+                        </button>
+                      ))}
+                    </div>
+
                     <p className="text-[10px] text-slate-500 mt-1">
-                      Lookup your existing registered herbal grower identity card
+                      Lookup your existing registered herbal grower identity card (Format: <code className="font-mono font-bold text-emerald-800">FARM-XXXX</code>)
                     </p>
                   </div>
 
